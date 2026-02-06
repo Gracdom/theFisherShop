@@ -7,6 +7,14 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
     ],
   },
+  // Excluir frameit del build
+  webpack: (config) => {
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/frameit/**'],
+    }
+    return config
+  },
 }
 
 module.exports = nextConfig
