@@ -1,0 +1,124 @@
+// Prisma Schema para Fishing Club E-commerce
+// Base de datos: PostgreSQL (Supabase)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Categorías
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  icon        String?   // Clase de icono FontAwesome
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Modelo de Productos
+model Product {
+  id          String      @id @default(cuid())
+  sku         String      @unique // SKU del producto
+  name        String
+  slug        String      @unique
+  description String?
+  price       Float       // Precio de venta recomendado (pvr)
+  oldPrice    Float?      // Precio anterior para mostrar descuento (pvr_old)
+  pvd         Float?      // Precio de distribución
+  pvdOld      Float?      // Precio de distribución anterior
+  pvdDif      String?     // Diferencia porcentual de precio de distribución
+  pvrDif      String?     // Diferencia porcentual de precio de venta recomendado
+  stock       Int         @default(0) // Stock total (suma de stock_a, stock_b, stock_c)
+  stockA      Int         @default(0) // Stock A
+  stockADays  Int         @default(0) // Días de stock A
+  stockB      Int         @default(0) // Stock B
+  stockBDays  Int         @default(0) // Días de stock B
+  stockC      Int         @default(0) // Stock C
+  stockCDays  Int         @default(0) // Días de stock C
+  image       String?
+  images      String[]    // Array de URLs de imágenes
+  video       String?     // URL del video del producto
+  rating      Float       @default(0)
+  reviews     Int         @default(0)
+  featured    Boolean     @default(false)
+  trending    Boolean     @default(false)
+  category    Category    @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([categoryId])
+  @@index([featured])
+  @@index([trending])
+  @@index([sku])
+}
+
+// Modelo de Clientes
+model Customer {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  name       String
+  phone      String?
+  address    String?
+  city       String?
+  postalCode String?
+  orders     Order[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([email])
+}
+
+// Modelo de Pedidos
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  customer        Customer    @relation(fields: [customerId], references: [id])
+  customerId      String
+  items           OrderItem[]
+  total           Float
+  status          OrderStatus @default(PENDING)
+  paymentStatus   String      @default("pending") // pending, paid, failed
+  stripeSessionId String?     @unique
+  shippingAddress String
+  shippingCity    String
+  shippingZip     String
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([customerId])
+  @@index([orderNumber])
+  @@index([status])
+}
+
+// Modelo de Items del Pedido
+model OrderItem {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  price     Float    // Precio al momento de la compra
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+// Enum para estados de pedido
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
