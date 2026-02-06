@@ -7,13 +7,15 @@
     "dev:3001": "next dev -p 3001",
     "dev:4000": "next dev -p 4000",
     "build": "next build",
+    "build:netlify": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
-    "db:import": "tsx prisma/import-csv.ts"
+    "db:import": "tsx prisma/import-csv.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.9.0",
