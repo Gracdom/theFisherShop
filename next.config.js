@@ -7,13 +7,17 @@ const nextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
     ],
   },
-  // Excluir frameit del build
+  // Excluir frameit y scripts de Prisma del build
   webpack: (config) => {
     config.watchOptions = {
       ...config.watchOptions,
-      ignored: ['**/frameit/**'],
+      ignored: ['**/frameit/**', '**/prisma/import-csv.ts', '**/prisma/seed.ts'],
     }
     return config
+  },
+  // Excluir scripts de Prisma del build de TypeScript
+  typescript: {
+    ignoreBuildErrors: false,
   },
 }
 
