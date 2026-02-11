@@ -71,8 +71,8 @@ async function importProducts() {
     const products = parseCSV(csvPath)
     console.log(`✅ Se encontraron ${products.length} productos en el CSV\n`)
 
-    // Obtener todas las categorías únicas
-    const uniqueCategories = [...new Set(products.map(p => p.category).filter(c => c && c !== '-'))]
+    // Obtener todas las categorías únicas (Array.from para compatibilidad con target es5)
+    const uniqueCategories = Array.from(new Set(products.map(p => p.category).filter(c => c && c !== '-')))
     console.log(`📁 Categorías encontradas: ${uniqueCategories.length}`)
     uniqueCategories.forEach(cat => console.log(`   - ${cat}`))
     console.log()
