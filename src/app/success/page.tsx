@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCart } from '@/context/CartContext'
 import Link from 'next/link'
 
-export default function SuccessPage() {
+function SuccessContent() {
   const { clearCart } = useCart()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -97,5 +97,17 @@ export default function SuccessPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
+        <div className="animate-pulse text-gray-500">Cargando...</div>
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   )
 }

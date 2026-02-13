@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import ProductCard, { Product } from '@/components/ProductCard'
@@ -49,7 +49,7 @@ function mapToCard(p: ApiProduct): Product {
 
 const ITEMS_PER_PAGE_OPTIONS = [9, 12, 24, 48]
 
-export default function TiendaPage() {
+function TiendaContent() {
   const [products, setProducts] = useState<Product[]>([])
   const [latestProducts, setLatestProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([])
@@ -394,5 +394,17 @@ export default function TiendaPage() {
         </div>
       </section>
     </div>
+  )
+}
+
+export default function TiendaPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center py-24">
+        <div className="animate-pulse text-gray-500">Cargando tienda...</div>
+      </div>
+    }>
+      <TiendaContent />
+    </Suspense>
   )
 }
