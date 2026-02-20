@@ -12,9 +12,14 @@ function SuccessContent() {
   const sessionId = searchParams.get('session_id')
 
   useEffect(() => {
-    // Limpiar el carrito después de una compra exitosa
     if (sessionId) {
       clearCart()
+      // Marcar pedido como pagado (fallback si el webhook no se ejecutó)
+      fetch('/api/orders/confirm-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId }),
+      }).catch(() => {})
     }
   }, [sessionId, clearCart])
 

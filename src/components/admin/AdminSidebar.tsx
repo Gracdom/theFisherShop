@@ -8,6 +8,8 @@ const navItems = [
   { href: '/admin/products', label: 'Productos', icon: 'fa-box' },
   { href: '/admin/categories', label: 'Categorías', icon: 'fa-tags' },
   { href: '/admin/orders', label: 'Pedidos', icon: 'fa-shopping-cart' },
+  { href: '/admin/newsletter', label: 'Newsletter', icon: 'fa-envelope' },
+  { href: '/admin/cart-email', label: 'Emails carrito', icon: 'fa-shopping-bag' },
 ]
 
 export default function AdminSidebar() {

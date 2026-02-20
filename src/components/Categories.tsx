@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { supabase } from '@/lib/supabase'
+import Link from 'next/link'
 
 interface SubcategoryItem {
   id: string
   name: string
+  slug: string
   categoryId: string
 }
 
@@ -76,38 +77,15 @@ export default function Categories() {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const { data: catData, error: catError } = await supabase
-          .from('Category')
-          .select('id, name, slug')
-          .order('name')
-
-        if (catError) throw catError
-        const cats = catData || []
-
-        let subData: SubcategoryItem[] = []
-        try {
-          const { data } = await supabase
-            .from('Subcategory')
-            .select('id, name, categoryId')
-            .order('name')
-          subData = data || []
-        } catch {
-          /* Subcategory opcional */
-        }
-
-        const subByCat = subData.reduce<Record<string, SubcategoryItem[]>>(
-          (acc, s) => {
-            if (!acc[s.categoryId]) acc[s.categoryId] = []
-            acc[s.categoryId].push(s)
-            return acc
-          },
-          {}
-        )
-
+        const res = await fetch('/api/categories')
+        if (!res.ok) throw new Error('Error cargando categorías')
+        const data = await res.json()
         setCategories(
-          cats.map((c) => ({
-            ...c,
-            subcategories: (subByCat[c.id] || []).slice(0, 2),
+          (data || []).map((c: ApiCategory) => ({
+            id: c.id,
+            name: c.name,
+            slug: c.slug,
+            subcategories: c.subcategories || [],
           }))
         )
       } catch {
@@ -177,41 +155,47 @@ export default function Categories() {
             {visibleCategories.map((category) => {
               const subcats = category.subcategories || []
               return (
-                <a
+                <div
                   key={category.id}
-                  href={`/tienda?categoria=${category.slug}`}
-                  className="flex flex-col items-center gap-4 group cursor-pointer block"
+                  className="flex flex-col items-center gap-4 group"
                 >
-                  <div className="relative w-48 h-48 rounded-full overflow-hidden bg-gray-100 shadow-[0_8px_15px_-3px_rgba(0,0,0,0.08)] group-hover:shadow-[0_8px_20px_-3px_rgba(0,0,0,0.12)] transition-all duration-300">
-                    <Image
-                      src={getImageForCategory(category.name)}
-                      alt={category.name}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-300"
-                      sizes="(max-width: 640px) 192px, (max-width: 1024px) 192px, 192px"
-                    />
-                  </div>
-                  <h3 className="font-serif text-gray-900 font-medium text-xl text-center">
-                    {category.name}
-                  </h3>
-                  <div className="flex flex-col items-center gap-1">
-                    {subcats.length >= 2 ? (
-                      subcats.map((s) => (
-                        <p key={s.id} className="text-sm text-gray-500 font-sans">
-                          - {s.name}
-                        </p>
+                  <Link
+                    href={`/tienda?categoria=${category.slug}`}
+                    className="flex flex-col items-center gap-2"
+                  >
+                    <div className="relative w-48 h-48 rounded-full overflow-hidden bg-gray-100 shadow-[0_8px_15px_-3px_rgba(0,0,0,0.08)] group-hover:shadow-[0_8px_20px_-3px_rgba(0,0,0,0.12)] transition-all duration-300">
+                      <Image
+                        src={getImageForCategory(category.name)}
+                        alt={category.name}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-300"
+                        sizes="(max-width: 640px) 192px, (max-width: 1024px) 192px, 192px"
+                      />
+                    </div>
+                    <h3 className="font-sans text-primary font-semibold text-xl text-center">
+                      {category.name}
+                    </h3>
+                  </Link>
+                  <div className="flex flex-wrap justify-center gap-x-3 gap-y-1">
+                    {subcats.length > 0 ? (
+                      subcats.slice(0, 2).map((s) => (
+                        <Link
+                          key={s.id}
+                          href={`/tienda?categoria=${category.slug}&subcategoria=${s.slug}`}
+                          className="text-sm text-gray-600 hover:text-primary font-medium transition"
+                        >
+                          {s.name}
+                        </Link>
                       ))
-                    ) : (
-                      <>
-                        <p className="text-sm text-gray-500 font-sans">- Subcategoría 1</p>
-                        <p className="text-sm text-gray-500 font-sans">- Subcategoría 2</p>
-                      </>
-                    )}
+                    ) : null}
                   </div>
-                  <span className="inline-block bg-[#0B2A51] hover:bg-blue-950 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors border-none">
+                  <Link
+                    href={`/tienda?categoria=${category.slug}`}
+                    className="inline-block bg-[#0B2A51] hover:bg-blue-950 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors border-none"
+                  >
                     Ver Todo
-                  </span>
-                </a>
+                  </Link>
+                </div>
               )
             })}
           </div>

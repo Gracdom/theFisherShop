@@ -131,3 +131,35 @@ enum OrderStatus {
   DELIVERED
   CANCELLED
 }
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  source    String?  @default("footer") // "footer" | "popup"
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model CheckoutLead {
+  id        String   @id @default(cuid())
+  email     String
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model AbandonedCart {
+  id          String   @id @default(cuid())
+  email       String
+  name        String?
+  items       Json     // [{ id, name, price, quantity, image? }]
+  total       Float
+  createdAt   DateTime @default(now())
+  email1SentAt DateTime?
+  email2SentAt DateTime?
+  email3SentAt DateTime?
+
+  @@index([email])
+  @@index([createdAt])
+}

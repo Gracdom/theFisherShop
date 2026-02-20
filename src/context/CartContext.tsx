@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react'
 
 export interface CartItem {
   id: string
@@ -10,6 +10,8 @@ export interface CartItem {
   image?: string
 }
 
+export const STORAGE_EMAIL_KEY = 'fisher_checkout_email'
+
 interface CartContextType {
   cart: CartItem[]
   addToCart: (item: Omit<CartItem, 'quantity'>) => void
@@ -18,28 +20,37 @@ interface CartContextType {
   clearCart: () => void
   getTotalItems: () => number
   getTotalPrice: () => number
+  showEmailPopup: boolean
+  dismissEmailPopup: () => void
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([])
+  const [showEmailPopup, setShowEmailPopup] = useState(false)
 
-  const addToCart = (item: Omit<CartItem, 'quantity'>) => {
+  const addToCart = useCallback((item: Omit<CartItem, 'quantity'>) => {
     setCart((prevCart) => {
+      const wasEmpty = prevCart.length === 0
       const existingItem = prevCart.find((cartItem) => cartItem.id === item.id)
       
-      if (existingItem) {
-        return prevCart.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        )
+      const nextCart = existingItem
+        ? prevCart.map((cartItem) =>
+            cartItem.id === item.id
+              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              : cartItem
+          )
+        : [...prevCart, { ...item, quantity: 1 }]
+
+      if (wasEmpty && typeof window !== 'undefined' && !localStorage.getItem(STORAGE_EMAIL_KEY)) {
+        setShowEmailPopup(true)
       }
-      
-      return [...prevCart, { ...item, quantity: 1 }]
+      return nextCart
     })
-  }
+  }, [])
+
+  const dismissEmailPopup = useCallback(() => setShowEmailPopup(false), [])
 
   const removeFromCart = (id: string) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== id))
@@ -80,6 +91,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         getTotalItems,
         getTotalPrice,
+        showEmailPopup,
+        dismissEmailPopup,
       }}
     >
       {children}

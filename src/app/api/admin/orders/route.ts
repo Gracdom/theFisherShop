@@ -11,9 +11,13 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50')
     const offset = parseInt(searchParams.get('offset') || '0')
 
+    const paid = searchParams.get('paid') === 'true'
     const where: any = {}
     if (status) {
       where.status = status
+    }
+    if (paid) {
+      where.paymentStatus = { in: ['paid', 'succeeded', 'completed'] }
     }
 
     const [orders, total] = await Promise.all([

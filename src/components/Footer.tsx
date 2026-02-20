@@ -2,9 +2,6 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Playfair_Display } from 'next/font/google'
-
-const playfair = Playfair_Display({ subsets: ['latin'], weight: ['600', '700'] })
 
 const STORE = {
   name: 'The Fisher Shop',
@@ -76,17 +73,33 @@ const socialLinks = [
 export default function Footer() {
   const [email, setEmail] = useState('')
   const [blogPage, setBlogPage] = useState(0)
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const visibleBlogPosts = blogPosts.slice(blogPage * 2, blogPage * 2 + 2)
 
-  const handleNewsletter = (e: React.FormEvent) => {
+  const handleNewsletter = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (email) {
-      setEmail('')
+    if (!email || !email.includes('@')) return
+    setNewsletterStatus('loading')
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), source: 'footer' }),
+      })
+      const data = await res.json()
+      if (res.ok || data.subscribed) {
+        setNewsletterStatus('success')
+        setEmail('')
+      } else {
+        setNewsletterStatus('error')
+      }
+    } catch {
+      setNewsletterStatus('error')
     }
   }
 
   return (
-    <footer className="bg-primary text-white border-t border-primary">
+    <footer className="font-sans bg-primary text-white border-t border-primary">
       {/* 1. Newsletter */}
       <div className="border-b border-white/20">
         <div className="container mx-auto px-4 py-10">
@@ -100,20 +113,28 @@ export default function Footer() {
                 <p className="text-white/80 text-sm">No te pierdas ofertas y novedades</p>
               </div>
             </div>
-            <form onSubmit={handleNewsletter} className="flex w-full lg:w-auto max-w-md">
+            <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row w-full lg:w-auto max-w-md gap-2">
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); setNewsletterStatus('idle') }}
                 placeholder="Introduce tu email"
-                className="flex-1 px-5 py-3 border border-white/30 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-white/50 bg-white/10 text-white placeholder-white/60"
+                disabled={newsletterStatus === 'loading'}
+                className="flex-1 px-5 py-3 border border-white/30 rounded-lg sm:rounded-l-lg sm:rounded-r-none focus:outline-none focus:ring-2 focus:ring-white/50 bg-white/10 text-white placeholder-white/60 disabled:opacity-70"
               />
               <button
                 type="submit"
-                className="px-6 py-3 bg-secondary hover:bg-white hover:text-primary text-white font-semibold rounded-r-lg transition-colors"
+                disabled={newsletterStatus === 'loading'}
+                className="px-6 py-3 bg-secondary hover:bg-white hover:text-primary text-white font-semibold rounded-lg sm:rounded-r-lg sm:rounded-l-none transition-colors disabled:opacity-70 flex-shrink-0"
               >
-                Suscribirse
+                {newsletterStatus === 'loading' ? 'Enviando...' : 'Suscribirse'}
               </button>
+              {newsletterStatus === 'success' && (
+                <p className="text-green-300 text-sm w-full sm:col-span-2">¡Gracias por suscribirte!</p>
+              )}
+              {newsletterStatus === 'error' && (
+                <p className="text-red-200 text-sm w-full sm:col-span-2">Error. Inténtalo de nuevo.</p>
+              )}
             </form>
           </div>
         </div>
@@ -124,7 +145,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
           {/* Columna 1 - Store Information */}
           <div>
-            <h5 className={`${playfair.className} font-semibold text-white mb-5 text-base`}>
+            <Link href="/" className="inline-block mb-5">
+              <img
+                src="/logo-white.webp"
+                alt={STORE.name}
+                className="h-10 w-auto"
+              />
+            </Link>
+            <h5 className="font-sans font-semibold text-white mb-5 text-base">
               Información de la tienda
             </h5>
             <ul className="space-y-4 text-white/80 text-sm">
@@ -168,7 +196,7 @@ export default function Footer() {
 
           {/* Columna 2 - Information */}
           <div>
-            <h5 className={`${playfair.className} font-semibold text-white mb-5 text-base`}>
+            <h5 className="font-sans font-semibold text-white mb-5 text-base">
               Información
             </h5>
             <ul className="space-y-2.5 text-sm">
@@ -187,7 +215,7 @@ export default function Footer() {
 
           {/* Columna 3 - My Account */}
           <div>
-            <h5 className={`${playfair.className} font-semibold text-white mb-5 text-base`}>
+            <h5 className="font-sans font-semibold text-white mb-5 text-base">
               Tu cuenta
             </h5>
             <ul className="space-y-2.5 text-sm">
@@ -207,7 +235,7 @@ export default function Footer() {
           {/* Columna 4 - Our Blog */}
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h5 className={`${playfair.className} font-semibold text-white text-base`}>
+              <h5 className="font-sans font-semibold text-white text-base">
                 Nuestro blog
               </h5>
               <div className="flex gap-1">

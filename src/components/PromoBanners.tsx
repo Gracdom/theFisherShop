@@ -6,7 +6,7 @@ export default function PromoBanners() {
           {/* Banner 1 */}
           <div className="relative rounded-2xl overflow-hidden min-h-[280px] flex items-center"
             style={{
-              backgroundImage: 'linear-gradient(rgba(0,61,91,0.7), rgba(0,90,130,0.7)), url("/images/banner-pescado.png")',
+              backgroundImage: 'linear-gradient(rgba(0,61,91,0.7), rgba(0,90,130,0.7)), url("/images/home%20(2).webp")',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}>
@@ -26,7 +26,7 @@ export default function PromoBanners() {
           {/* Banner 2 */}
           <div className="relative rounded-2xl overflow-hidden min-h-[280px] flex items-center"
             style={{
-              backgroundImage: 'linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url("/images/banner-senuelo.png")',
+              backgroundImage: 'linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url("/images/home%20(3).webp")',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}>

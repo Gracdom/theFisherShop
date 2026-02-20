@@ -14,6 +14,7 @@ interface ApiProduct {
   price: number
   oldPrice?: number | null
   image?: string | null
+  images?: string[]
   rating?: number
   featured?: boolean
   trending?: boolean
@@ -41,7 +42,7 @@ function mapApiProductToCard(p: ApiProduct): Product {
     price: p.price,
     originalPrice: p.oldPrice || undefined,
     rating: p.rating ?? 0,
-    image: p.image || undefined,
+    image: p.image || p.images?.[0] || undefined,
     badge,
     badgeType,
   }
@@ -62,7 +63,7 @@ export default function ProductsSection() {
       try {
         let query = supabase
           .from('Product')
-          .select('id, slug, name, description, price, oldPrice, image, rating, featured, trending')
+          .select('id, slug, name, description, price, oldPrice, image, images, rating, featured, trending')
 
         if (categorySlug) {
           const { data: cat } = await supabase

@@ -36,8 +36,8 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
           <div className="flex items-center justify-between p-6 border-b bg-primary">
             <div className="flex items-center gap-3">
               <Image
-                src="/logo.png"
-                alt="Escamar Pesca"
+                src="/logo-white.webp"
+                alt="The Fisher Shop"
                 width={120}
                 height={30}
                 className="h-8 w-auto"
@@ -64,12 +64,20 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
             ) : (
               <div className="space-y-4">
                 {cart.map((item) => (
-                  <div
+                    <div
                     key={item.id}
                     className="flex gap-4 p-4 bg-gray-50 rounded-lg"
                   >
-                    <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <i className="fas fa-fish text-gray-400 text-2xl"></i>
+                    <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <i className="fas fa-fish text-gray-400 text-2xl"></i>
+                      )}
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900">{item.name}</h3>

@@ -64,10 +64,17 @@ export default function ProductoPage() {
     fetchProduct()
   }, [slug])
 
+  const mainImage = product ? (product.image || product.images?.[0]) : null
+
   const handleAddToCart = () => {
     if (!product) return
     for (let i = 0; i < quantity; i++) {
-      addToCart({ id: product.id, name: product.name, price: product.price })
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: mainImage || undefined,
+      })
     }
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)

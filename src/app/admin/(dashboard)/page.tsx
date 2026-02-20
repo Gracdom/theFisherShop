@@ -9,21 +9,24 @@ export default function AdminDashboardPage() {
     categories: 0,
     orders: 0,
     totalRevenue: 0,
+    newsletter: 0,
   })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [productsRes, categoriesRes, ordersRes] = await Promise.all([
+        const [productsRes, categoriesRes, ordersRes, newsletterRes] = await Promise.all([
           fetch('/api/products'),
           fetch('/api/categories'),
           fetch('/api/admin/orders'),
+          fetch('/api/admin/newsletter'),
         ])
 
         const products = await productsRes.json()
         const categories = await categoriesRes.json()
         const { orders } = await ordersRes.json()
+        const { total: newsletterTotal } = await newsletterRes.json()
 
         const totalRevenue = Array.isArray(orders)
           ? orders.reduce((sum: number, o: { total: number }) => sum + o.total, 0)
@@ -34,9 +37,10 @@ export default function AdminDashboardPage() {
           categories: Array.isArray(categories) ? categories.length : 0,
           orders: Array.isArray(orders) ? orders.length : 0,
           totalRevenue,
+          newsletter: typeof newsletterTotal === 'number' ? newsletterTotal : 0,
         })
       } catch {
-        setStats({ products: 0, categories: 0, orders: 0, totalRevenue: 0 })
+        setStats({ products: 0, categories: 0, orders: 0, totalRevenue: 0, newsletter: 0 })
       } finally {
         setLoading(false)
       }
@@ -73,6 +77,13 @@ export default function AdminDashboardPage() {
       href: '/admin/orders',
       color: 'amber',
     },
+    {
+      title: 'Newsletter',
+      value: stats.newsletter,
+      icon: 'fa-envelope',
+      href: '/admin/newsletter',
+      color: 'cyan',
+    },
   ]
 
   const colorClasses: Record<string, string> = {
@@ -80,6 +91,7 @@ export default function AdminDashboardPage() {
     emerald: 'bg-emerald-50 text-emerald-600 border-emerald-200',
     violet: 'bg-violet-50 text-violet-600 border-violet-200',
     amber: 'bg-amber-50 text-amber-600 border-amber-200',
+    cyan: 'bg-cyan-50 text-cyan-600 border-cyan-200',
   }
 
   return (
@@ -88,8 +100,8 @@ export default function AdminDashboardPage() {
       <p className="text-gray-500 mb-8">Resumen de tu tienda The FisherShop</p>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          {[...Array(5)].map((_, i) => (
             <div
               key={i}
               className="h-32 bg-gray-100 rounded-xl animate-pulse"
@@ -97,7 +109,7 @@ export default function AdminDashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {cards.map((card) => (
             <Link
               key={card.title}

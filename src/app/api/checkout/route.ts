@@ -6,27 +6,48 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-11-20.acacia',
 })
 
+const SHIPPING_COST = 6.00
+const IVA_RATE = 0.21
+
 export async function POST(request: NextRequest) {
   try {
     const { items, customerInfo } = await request.json()
 
-    // Calcular total
-    const total = items.reduce((sum: number, item: any) => 
+    // Calcular subtotal, IVA y total
+    const subtotal = items.reduce((sum: number, item: any) => 
       sum + (item.price * item.quantity), 0
     )
+    const iva = subtotal * IVA_RATE
+    const total = subtotal + iva + SHIPPING_COST
 
-    // Crear line items para Stripe
-    const lineItems = items.map((item: any) => ({
+    // Crear line items para Stripe (precios con IVA incluido)
+    const lineItems = items.map((item: any) => {
+      const priceWithIva = item.price * (1 + IVA_RATE)
+      return {
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: item.name,
+            description: `Producto de pesca - ${item.name}`,
+          },
+          unit_amount: Math.round(priceWithIva * 100),
+        },
+        quantity: item.quantity,
+      }
+    })
+
+    // Añadir envío como line item
+    lineItems.push({
       price_data: {
         currency: 'eur',
         product_data: {
-          name: item.name,
-          description: `Producto de pesca - ${item.name}`,
+          name: 'Envío',
+          description: 'Envío estándar a España peninsular (24-48h)',
         },
-        unit_amount: Math.round(item.price * 100), // Stripe usa centavos
+        unit_amount: Math.round(SHIPPING_COST * 100),
       },
-      quantity: item.quantity,
-    }))
+      quantity: 1,
+    })
 
     // Buscar o crear cliente en la base de datos
     let customer = await prisma.customer.findUnique({

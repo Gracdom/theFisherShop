@@ -7,13 +7,26 @@ import { usePathname } from 'next/navigation'
 import { useCart } from '@/context/CartContext'
 import CartModal from './CartModal'
 
+interface CategoryItem {
+  id: string
+  name: string
+  slug: string
+}
+
 export default function Header() {
   const { getTotalItems, getTotalPrice } = useCart()
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
+  const [categories, setCategories] = useState<CategoryItem[]>([])
   const pathname = usePathname()
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then((r) => r.ok ? r.json() : [])
+      .then((data) => setCategories(data || []))
+      .catch(() => setCategories([]))
+  }, [])
   const isHome = pathname === '/'
 
   useEffect(() => {
@@ -35,30 +48,31 @@ export default function Header() {
         backgroundColor: scrolled ? '#ffffff' : showTransparent ? 'transparent' : '#ffffff',
       }}
     >
-      {/* Top Bar - Moderno con información de contacto */}
+      {/* Top Bar - Información de contacto */}
       {!showTransparent && (
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white text-xs py-1.5 border-b border-blue-500/30">
+        <div className="text-white text-xs py-1.5" style={{ backgroundColor: '#395690' }}>
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-center">
-              <div className="flex gap-6 md:gap-8">
-                <a
-                  href="https://wa.me/34910202911"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 hover:text-blue-100 transition"
-                >
-                  <i className="fab fa-whatsapp text-blue-200"></i>
-                  <span className="hidden sm:inline">WhatsApp: +34 910 202 911</span>
-                  <span className="sm:hidden">+34 910 202 911</span>
-                </a>
-                <a
-                  href="mailto:info@thefishershop.com"
-                  className="hidden md:flex items-center gap-2 hover:text-blue-100 transition"
-                >
-                  <i className="fas fa-envelope text-blue-200"></i>
-                  info@thefishershop.com
-                </a>
-              </div>
+              <a
+                href="https://wa.me/34910202911"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:text-white/80 transition"
+              >
+                <i className="fab fa-whatsapp text-white/90"></i>
+                <span className="hidden sm:inline">WhatsApp: +34 910 202 911</span>
+                <span className="sm:hidden">+34 910 202 911</span>
+              </a>
+              <p className="hidden md:block text-white/90 font-medium">
+                Envío gratis en pedidos +€50
+              </p>
+              <a
+                href="mailto:info@thefishershop.com"
+                className="flex items-center gap-2 hover:text-white/80 transition"
+              >
+                <i className="fas fa-envelope text-white/90"></i>
+                <span className="hidden sm:inline">info@thefishershop.com</span>
+              </a>
             </div>
           </div>
         </div>
@@ -77,7 +91,7 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" className="flex items-center z-10">
               <Image
-                src="/logo.png"
+                src={showTransparent ? '/logo-white.webp' : '/logo.webp'}
                 alt="The FisherShop - Equipamiento de pesca profesional"
                 width={220}
                 height={55}
@@ -101,11 +115,11 @@ export default function Header() {
 
             {/* Navegación Desktop */}
             <nav className="flex-1 mx-8 hidden lg:block">
-              <ul className="flex justify-center gap-8 text-sm">
-                <li>
+              <ul className="flex items-center justify-center gap-8 text-sm">
+                <li className="flex items-center">
                   <Link
                     href="/"
-                    className={`py-2 font-semibold transition-colors relative group ${
+                    className={`py-2 font-semibold transition-colors relative group flex items-center ${
                       showTransparent ? 'text-white hover:text-white/90' : 'text-gray-900 hover:text-gray-700'
                     }`}
                   >
@@ -115,23 +129,46 @@ export default function Header() {
                     }`}></span>
                   </Link>
                 </li>
-                <li>
+                <li className="relative group/sub flex items-center">
                   <Link
                     href="/tienda"
-                    className={`py-2 font-semibold transition-colors relative group ${
+                    className={`py-2 font-semibold transition-colors relative flex items-center ${
                       showTransparent ? 'text-white hover:text-white/90' : 'text-gray-900 hover:text-gray-700'
                     }`}
                   >
                     Tienda
-                    <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
+                    <i className="fas fa-chevron-down ml-1 text-xs opacity-70"></i>
+                    <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover/sub:w-full transition-all duration-300 ${
                       showTransparent ? 'bg-white' : 'bg-gray-900'
                     }`}></span>
                   </Link>
+                  {categories.length > 0 && (
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full pt-1 opacity-0 invisible group-hover/sub:opacity-100 group-hover/sub:visible transition-all duration-200 before:absolute before:inset-x-0 before:-top-2 before:h-3 before:block">
+                      <div className="relative bg-white rounded-lg shadow-xl border border-gray-100 py-2 min-w-[200px]">
+                        <Link
+                          href="/tienda"
+                          className="block px-4 py-2 text-sm font-medium text-gray-900 hover:bg-primary/10 hover:text-primary transition"
+                        >
+                          Ver toda la tienda
+                        </Link>
+                        <hr className="my-2 border-gray-100" />
+                        {categories.map((cat) => (
+                          <Link
+                            key={cat.id}
+                            href={`/tienda?categoria=${cat.slug}`}
+                            className="block px-4 py-2 text-sm text-gray-600 hover:bg-primary/10 hover:text-primary transition"
+                          >
+                            {cat.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </li>
-                <li>
+                <li className="flex items-center">
                   <Link
                     href="/contacto"
-                    className={`py-2 font-semibold transition-colors relative group ${
+                    className={`py-2 font-semibold transition-colors relative group flex items-center ${
                       showTransparent ? 'text-white hover:text-white/90' : 'text-gray-900 hover:text-gray-700'
                     }`}
                   >
@@ -141,10 +178,10 @@ export default function Header() {
                     }`}></span>
                   </Link>
                 </li>
-                <li>
+                <li className="flex items-center">
                   <Link
                     href="/sobre-nosotros"
-                    className={`py-2 font-semibold transition-colors relative group ${
+                    className={`py-2 font-semibold transition-colors relative group flex items-center ${
                       showTransparent ? 'text-white hover:text-white/90' : 'text-gray-900 hover:text-gray-700'
                     }`}
                   >
@@ -154,10 +191,10 @@ export default function Header() {
                     }`}></span>
                   </Link>
                 </li>
-                <li>
+                <li className="flex items-center">
                   <Link
                     href="/faq"
-                    className={`py-2 font-semibold transition-colors relative group ${
+                    className={`py-2 font-semibold transition-colors relative group flex items-center ${
                       showTransparent ? 'text-white hover:text-white/90' : 'text-gray-900 hover:text-gray-700'
                     }`}
                   >
@@ -240,6 +277,21 @@ export default function Header() {
                 >
                   Tienda
                 </Link>
+                {categories.length > 0 && (
+                  <ul className="pl-4 mt-1 space-y-1 border-l-2 border-gray-200 ml-2">
+                    {categories.map((cat) => (
+                      <li key={cat.id}>
+                        <Link
+                          href={`/tienda?categoria=${cat.slug}`}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="py-2 block text-sm text-gray-600 hover:text-primary transition"
+                        >
+                          {cat.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
               <li>
                 <Link

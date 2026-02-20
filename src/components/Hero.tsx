@@ -16,7 +16,14 @@ const slides = [
     buttonText: "Ver Productos",
     buttonLink: "/tienda",
     features: ["+500 Productos", "Expertos en Pesca", "Soporte 24/7"],
-  }
+  },
+  {
+    title: "Todo para Tu Próxima Captura",
+    subtitle: "Las mejores marcas y equipamiento de pesca. Envío rápido y asesoramiento experto.",
+    buttonText: "Ver Tienda",
+    buttonLink: "/tienda",
+    features: ["Marcas Top", "Ofertas Exclusivas", "Envío 24-48h"],
+  },
 ]
 
 export default function Hero() {
@@ -25,7 +32,7 @@ export default function Hero() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }, 8000) // Cambia cada 8 segundos (más lento)
+    }, 6000) // Cambia cada 6 segundos
 
     return () => clearInterval(interval)
   }, [])
@@ -34,7 +41,7 @@ export default function Hero() {
     setCurrentSlide(index)
   }
 
-  const bannerImages = ['/images/banner.webp', '/images/banner2.webp']
+  const bannerImages = ['/images/banner.webp', '/images/banner2.webp', '/images/banner.webp']
 
   const stars = Array.from({ length: 12 }, (_, i) => ({
     id: i,
@@ -162,12 +169,6 @@ export default function Hero() {
           ))}
         </div>
       </div>
-      
-      {/* Botón de chat flotante */}
-      <button className="fixed bottom-8 right-8 w-16 h-16 bg-primary/90 backdrop-blur rounded-full flex items-center justify-center shadow-2xl hover:bg-secondary transition z-50 border-2 border-secondary animate-bounce" style={{ animationDuration: '2s' }}>
-        <i className="fas fa-comments text-white text-2xl"></i>
-      </button>
-      
     </section>
   )
 }

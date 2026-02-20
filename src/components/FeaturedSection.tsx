@@ -35,7 +35,7 @@ export default function FeaturedSection() {
             <div className="absolute inset-0 bg-gradient-to-br from-blue-200/30 to-blue-400/20 rounded-full blur-3xl"></div>
             <div className="relative w-full h-96 rounded-3xl flex items-center justify-center overflow-hidden shadow-2xl"
               style={{
-                backgroundImage: 'url("/images/section-lago.png")',
+                backgroundImage: 'url("/images/home%20(1).webp")',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
               }}>

@@ -14,6 +14,7 @@ interface ApiProduct {
   price: number
   oldPrice?: number | null
   image?: string | null
+  images?: string[]
   rating?: number
   featured?: boolean
   trending?: boolean
@@ -41,7 +42,7 @@ function mapToCard(p: ApiProduct): Product {
     price: p.price,
     originalPrice: p.oldPrice || undefined,
     rating: p.rating ?? 0,
-    image: p.image || undefined,
+    image: p.image || p.images?.[0] || undefined,
     badge,
     badgeType,
   }
@@ -49,17 +50,76 @@ function mapToCard(p: ApiProduct): Product {
 
 const ITEMS_PER_PAGE_OPTIONS = [9, 12, 24, 48]
 
+// Subcategorías por defecto cuando no hay datos en BD (por slug de categoría)
+const DEFAULT_SUBCATEGORIES: Record<string, { name: string; slug: string }[]> = {
+  'accesorios': [
+    { name: 'Cajas y maletines', slug: 'cajas-maletines' },
+    { name: 'Herramientas', slug: 'herramientas' },
+    { name: 'Bolsas', slug: 'bolsas' },
+  ],
+  'barcos-de-pesca': [
+    { name: 'Barcas', slug: 'barcas' },
+    { name: 'Kayaks', slug: 'kayaks' },
+  ],
+  'carretes': [
+    { name: 'Spinning', slug: 'spinning' },
+    { name: 'Baitcasting', slug: 'baitcasting' },
+    { name: 'Mosca', slug: 'mosca' },
+  ],
+  'canas': [
+    { name: 'Cañas de spinning', slug: 'spinning' },
+    { name: 'Cañas de mosca', slug: 'mosca' },
+    { name: 'Cañas telescópicas', slug: 'telescopicas' },
+  ],
+  'pesca-con-mosca': [
+    { name: 'Moscas', slug: 'moscas' },
+    { name: 'Líneas', slug: 'lineas' },
+    { name: 'Accesorios mosca', slug: 'accesorios' },
+  ],
+  'ropa': [
+    { name: 'Chaquetas', slug: 'chaquetas' },
+    { name: 'Botas y vadeadores', slug: 'botas-vadeadores' },
+    { name: 'Sombreros', slug: 'sombreros' },
+  ],
+  'sedales': [
+    { name: 'Monofilamento', slug: 'monofilamento' },
+    { name: 'Trenzado', slug: 'trenzado' },
+    { name: 'Fluorocarbono', slug: 'fluorocarbono' },
+  ],
+  'senuelos-y-moscas': [
+    { name: 'Señuelos', slug: 'senuelos' },
+    { name: 'Moscas artificiales', slug: 'moscas' },
+    { name: 'Cebos', slug: 'cebos' },
+  ],
+  // Alias por si el slug varía (con/sin ñ)
+  'cañas': [
+    { name: 'Cañas de spinning', slug: 'spinning' },
+    { name: 'Cañas de mosca', slug: 'mosca' },
+    { name: 'Cañas telescópicas', slug: 'telescopicas' },
+  ],
+  'señuelos-y-moscas': [
+    { name: 'Señuelos', slug: 'senuelos' },
+    { name: 'Moscas artificiales', slug: 'moscas' },
+    { name: 'Cebos', slug: 'cebos' },
+  ],
+}
+
 function TiendaContent() {
   const [products, setProducts] = useState<Product[]>([])
   const [latestProducts, setLatestProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([])
+  const [subcategories, setSubcategories] = useState<{ id: string; name: string; slug: string; categoryId: string }[]>([])
+  const [subsByCategory, setSubsByCategory] = useState<Record<string, { id: string; name: string; slug: string }[]>>({})
   const [loading, setLoading] = useState(true)
   const [sortBy, setSortBy] = useState('default')
   const [itemsPerPage, setItemsPerPage] = useState(9)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [currentPage, setCurrentPage] = useState(1)
+  const [filterColor, setFilterColor] = useState<Record<string, boolean>>({})
+  const [filterPrice, setFilterPrice] = useState<Record<string, boolean>>({})
   const searchParams = useSearchParams()
   const categorySlug = searchParams.get('categoria')
+  const subcategorySlug = searchParams.get('subcategoria')
 
   useEffect(() => {
     async function fetch() {
@@ -68,13 +128,36 @@ function TiendaContent() {
         const { data: cats } = await supabase.from('Category').select('id, name, slug').order('name')
         setCategories(cats || [])
 
-        let query = supabase
-          .from('Product')
-          .select('id, slug, name, description, price, oldPrice, image, rating, featured, trending')
+        const { data: allSubs } = await supabase.from('Subcategory').select('id, name, slug, categoryId').order('name')
+        const subs = allSubs || []
+        setSubcategories(subs)
+        const byCat = subs.reduce<Record<string, { id: string; name: string; slug: string }[]>>((acc, s) => {
+          if (!acc[s.categoryId]) acc[s.categoryId] = []
+          acc[s.categoryId].push({ id: s.id, name: s.name, slug: s.slug })
+          return acc
+        }, {})
+        setSubsByCategory(byCat)
 
+        let categoryId: string | null = null
         if (categorySlug) {
           const { data: cat } = await supabase.from('Category').select('id').eq('slug', categorySlug).single()
-          if (cat) query = query.eq('categoryId', cat.id)
+          categoryId = cat?.id ?? null
+        }
+
+        let query = supabase
+          .from('Product')
+          .select('id, slug, name, description, price, oldPrice, image, images, rating, featured, trending')
+
+        if (categoryId) query = query.eq('categoryId', categoryId)
+
+        if (subcategorySlug && categoryId) {
+          const { data: sub } = await supabase
+            .from('Subcategory')
+            .select('id')
+            .eq('slug', subcategorySlug)
+            .eq('categoryId', categoryId)
+            .single()
+          if (sub) query = query.eq('subcategoryId', sub.id)
         }
 
         const { data, error } = await query.order('createdAt', { ascending: false })
@@ -83,7 +166,7 @@ function TiendaContent() {
 
         const { data: latest } = await supabase
           .from('Product')
-          .select('id, slug, name, price, oldPrice, image')
+          .select('id, slug, name, price, oldPrice, image, images')
           .order('createdAt', { ascending: false })
           .limit(3)
         setLatestProducts((latest || []).map(mapToCard))
@@ -95,12 +178,39 @@ function TiendaContent() {
       }
     }
     fetch()
-  }, [categorySlug])
+  }, [categorySlug, subcategorySlug])
 
   const activeCat = categories.find((c) => c.slug === categorySlug)
-  const title = activeCat ? activeCat.name : 'Tienda'
+  const activeSub = subcategories.find((s) => s.slug === subcategorySlug)
+  const title = activeSub ? `${activeCat?.name} › ${activeSub.name}` : (activeCat ? activeCat.name : 'Tienda')
 
-  const sortedProducts = [...products]
+  // Imagen del banner: tienda (1) para "Tienda" general, tienda (2-10) por categoría
+  const bannerImage = !categorySlug
+    ? '/images/tienda%20(1).webp'
+    : (() => {
+        const idx = categories.findIndex((c) => c.slug === categorySlug)
+        const n = idx >= 0 ? Math.min(idx + 2, 10) : 1
+        return `/images/tienda%20(${n}).webp`
+      })()
+
+  const priceRanges: Record<string, [number, number]> = {
+    '0€ - 25€': [0, 25],
+    '25€ - 50€': [25, 50],
+    '50€ - 100€': [50, 100],
+    '100€+': [100, Infinity],
+  }
+  let filteredProducts = [...products]
+  const activePriceFilters = Object.entries(filterPrice).filter(([, v]) => v).map(([k]) => k)
+  if (activePriceFilters.length > 0) {
+    filteredProducts = filteredProducts.filter((p) =>
+      activePriceFilters.some((range) => {
+        const [min, max] = priceRanges[range] || [0, Infinity]
+        return p.price >= min && p.price < max
+      })
+    )
+  }
+
+  const sortedProducts = [...filteredProducts]
   if (sortBy === 'price-asc') sortedProducts.sort((a, b) => a.price - b.price)
   if (sortBy === 'price-desc') sortedProducts.sort((a, b) => b.price - a.price)
   if (sortBy === 'name') sortedProducts.sort((a, b) => a.name.localeCompare(b.name))
@@ -111,97 +221,46 @@ function TiendaContent() {
 
   return (
     <div className="bg-[#fafbfc] min-h-screen">
-      {/* Breadcrumbs - minimal */}
+      {/* Breadcrumbs - centrados */}
       <div className="container mx-auto px-4 pt-6">
-        <nav className="text-xs md:text-sm text-gray-400 tracking-wide">
-          <Link href="/" className="hover:text-primary transition-colors">Inicio</Link>
-          <span className="mx-2">/</span>
-          <span className="text-gray-600">{title}</span>
+        <nav className="flex justify-center">
+          <div className="flex items-center gap-2 text-xs md:text-sm text-gray-500">
+            <Link href="/" className="hover:text-primary transition-colors flex items-center gap-1">
+              <i className="fas fa-home text-gray-400"></i> Inicio
+            </Link>
+            <span>/</span>
+            <Link href="/tienda" className={!categorySlug ? 'text-gray-900 font-medium' : 'hover:text-primary transition-colors'}>
+              Tienda
+            </Link>
+            {activeCat && (
+              <>
+                <span>/</span>
+                <Link
+                  href={`/tienda?categoria=${categorySlug}`}
+                  className={activeSub ? 'hover:text-primary transition-colors' : 'text-gray-900 font-medium'}
+                >
+                  {activeCat.name}
+                </Link>
+              </>
+            )}
+            {activeSub && (
+              <>
+                <span>/</span>
+                <span className="text-gray-900 font-medium">{activeSub.name}</span>
+              </>
+            )}
+          </div>
         </nav>
       </div>
 
-      {/* Category Banner - gradient overlay, dramatic */}
-      <div
-        className="w-full h-56 md:h-72 lg:h-80 mt-4 bg-cover bg-center relative overflow-hidden"
-        style={{
-          backgroundImage: 'url("/images/hero-banner.png")',
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/70 to-secondary/50" />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white tracking-tight drop-shadow-lg px-4">
-            {title}
-          </h1>
-        </div>
-      </div>
-
-      {/* Description - subtle */}
-      <div className="container mx-auto px-4 py-8">
-        <p className="text-gray-500 max-w-2xl text-sm md:text-base leading-relaxed">
-          Equipamiento profesional para pesca. Calidad, precios competitivos y todo lo que necesitas para tu próxima aventura.
-        </p>
-      </div>
-
-      <div className="container mx-auto px-4 pb-20">
-        {/* Product controls - pill style, glass feel */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center rounded-full bg-white/80 backdrop-blur-sm border border-gray-200/80 shadow-sm p-1">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2.5 rounded-full transition-all duration-200 ${
-                  viewMode === 'grid' ? 'bg-primary text-white shadow-md' : 'text-gray-400 hover:text-primary hover:bg-gray-50'
-                }`}
-                title="Vista grid"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2.5 rounded-full transition-all duration-200 ${
-                  viewMode === 'list' ? 'bg-primary text-white shadow-md' : 'text-gray-400 hover:text-primary hover:bg-gray-50'
-                }`}
-                title="Vista lista"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                </svg>
-              </button>
-            </div>
-            <span className="text-gray-400 text-xs hidden sm:inline">{sortedProducts.length} productos</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2.5 rounded-full border border-gray-200/80 bg-white/80 backdrop-blur-sm text-sm text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none cursor-pointer shadow-sm"
-            >
-              <option value="default">Por defecto</option>
-              <option value="price-asc">Precio ↑</option>
-              <option value="price-desc">Precio ↓</option>
-              <option value="name">Nombre</option>
-            </select>
-            <select
-              value={itemsPerPage}
-              onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1) }}
-              className="px-4 py-2.5 rounded-full border border-gray-200/80 bg-white/80 backdrop-blur-sm text-sm text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary appearance-none cursor-pointer shadow-sm"
-            >
-              {ITEMS_PER_PAGE_OPTIONS.map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-10">
-          {/* Left Sidebar - glass cards */}
-          <aside className="lg:w-80 flex-shrink-0 space-y-6">
+      <div className="container mx-auto px-4 pb-20 pt-4">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar izquierdo - filtros desde arriba */}
+          <aside className="lg:w-72 xl:w-80 flex-shrink-0 order-2 lg:order-1">
             <div className="lg:sticky lg:top-24 space-y-6">
-              {/* Categories */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-gray-200/50">
-                <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Categorías</h3>
+              {/* Categories con subcategorías anidadas */}
+              <div className="bg-gray-50 rounded-3xl p-6">
+                <h3 className="font-bold text-gray-900 mb-4">Categorías</h3>
                 <ul className="space-y-1">
                   <li>
                     <Link
@@ -213,30 +272,131 @@ function TiendaContent() {
                       Todas
                     </Link>
                   </li>
-                  {categories.map((c) => (
-                    <li key={c.id}>
-                      <Link
-                        href={`/tienda?categoria=${c.slug}`}
-                        className={`block py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
-                          categorySlug === c.slug ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-100 hover:text-primary'
-                        }`}
-                      >
-                        {c.name}
-                      </Link>
-                    </li>
-                  ))}
+                  {categories.map((c) => {
+                    const fromDb = subsByCategory[c.id] || []
+                    const fromDefaults = DEFAULT_SUBCATEGORIES[c.slug] || []
+                    const subs = fromDb.length > 0
+                      ? fromDb
+                      : fromDefaults.map((s, i) => ({ id: `default-${c.id}-${i}`, name: s.name, slug: s.slug }))
+                    const isActive = categorySlug === c.slug
+                    return (
+                      <li key={c.id}>
+                        <Link
+                          href={`/tienda?categoria=${c.slug}`}
+                          className={`block py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
+                            isActive && !subcategorySlug ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-100 hover:text-primary'
+                          }`}
+                        >
+                          {c.name}
+                        </Link>
+                        {subs.length > 0 && isActive && (
+                          <ul className="pl-4 mt-0.5 mb-2 space-y-0.5 border-l-2 border-gray-200 ml-4">
+                            <li>
+                              <Link
+                                href={`/tienda?categoria=${c.slug}`}
+                                className={`block py-2 px-3 rounded-lg text-sm transition-all ${
+                                  isActive && !subcategorySlug ? 'text-primary font-medium' : 'text-gray-500 hover:text-primary hover:bg-gray-100/80'
+                                }`}
+                              >
+                                Todas
+                              </Link>
+                            </li>
+                            {subs.map((s) => (
+                              <li key={s.id}>
+                                <Link
+                                  href={`/tienda?categoria=${c.slug}&subcategoria=${s.slug}`}
+                                  className={`block py-2 px-3 rounded-lg text-sm transition-all ${
+                                    isActive && subcategorySlug === s.slug ? 'text-primary font-medium' : 'text-gray-500 hover:text-primary hover:bg-gray-100/80'
+                                  }`}
+                                >
+                                  {s.name}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    )
+                  })}
                 </ul>
+              </div>
+
+              {/* Refine Search - tags activos + filtros */}
+              <div className="bg-gray-50 rounded-3xl p-6">
+                <h3 className="font-bold text-gray-900 mb-4">Refine Search</h3>
+                {(activePriceFilters.length > 0 || Object.values(filterColor).some(Boolean)) && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {activePriceFilters.map((range) => (
+                      <span
+                        key={range}
+                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium border border-primary/20"
+                      >
+                        {range} <button onClick={() => setFilterPrice((p) => ({ ...p, [range]: false }))} className="hover:text-primary/70">×</button>
+                      </span>
+                    ))}
+                    {Object.entries(filterColor).filter(([, v]) => v).map(([color]) => (
+                      <span
+                        key={color}
+                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium border border-primary/20"
+                      >
+                        {color} <button onClick={() => setFilterColor((p) => ({ ...p, [color]: false }))} className="hover:text-primary/70">×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-gray-800 mb-3">Color</h4>
+                  <ul className="space-y-2">
+                    {['Negro', 'Azul', 'Verde', 'Gris', 'Naranja'].map((color) => (
+                      <li key={color}>
+                        <label className="flex items-center gap-2 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={filterColor[color] || false}
+                            onChange={() => setFilterColor((prev) => ({ ...prev, [color]: !prev[color] }))}
+                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                          />
+                          <span className="text-sm text-gray-600 group-hover:text-gray-900">{color}</span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="mb-4">
+                  <h4 className="text-sm font-semibold text-gray-800 mb-3">Precio</h4>
+                  <ul className="space-y-2">
+                    {['0€ - 25€', '25€ - 50€', '50€ - 100€', '100€+'].map((range) => (
+                      <li key={range}>
+                        <label className="flex items-center gap-2 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={filterPrice[range] || false}
+                            onChange={() => setFilterPrice((prev) => ({ ...prev, [range]: !prev[range] }))}
+                            className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                          />
+                          <span className="text-sm text-gray-600 group-hover:text-gray-900">{range}</span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <button
+                  type="button"
+                  className="w-full py-2.5 bg-primary text-white font-semibold rounded-xl hover:bg-secondary transition shadow-[0_4px_0_rgb(0,0,0,0.2)] active:shadow-none active:translate-y-0.5"
+                >
+                  Refine Search
+                </button>
               </div>
 
               {/* Promo Banner */}
               <Link
                 href="/tienda"
-                className="block relative overflow-hidden rounded-2xl group"
+                className="block relative overflow-hidden rounded-3xl group"
               >
                 <div
                   className="h-56 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
                   style={{
-                    backgroundImage: 'url("/images/section-pescador.png")',
+                    backgroundImage: 'url("/images/tienda%20(2).webp")',
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/50 to-transparent flex flex-col justify-end p-6">
@@ -252,7 +412,7 @@ function TiendaContent() {
               </Link>
 
               {/* Latest Products */}
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-gray-200/50">
+              <div className="bg-gray-50 rounded-3xl p-6">
                 <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Recientes</h3>
                 <div className="space-y-3">
                   {latestProducts.map((p) => (
@@ -281,8 +441,93 @@ function TiendaContent() {
             </div>
           </aside>
 
-          {/* Product Grid */}
-          <div className="flex-1">
+          {/* Contenido principal - derecho */}
+          <div className="flex-1 min-w-0 order-1 lg:order-2">
+            {/* Hero Banner - título a la derecha, bordes redondeados */}
+            <div
+              className="h-48 md:h-64 lg:h-72 rounded-[2rem] bg-cover bg-center relative overflow-hidden mb-8 transition-[background-image] duration-500"
+              style={{
+                backgroundImage: `url("${bannerImage}")`,
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/40 to-primary/90" />
+              <div className="absolute inset-0 flex items-center justify-end">
+                <div className="px-8 md:px-12 text-right">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight drop-shadow-lg">
+                    {title}
+                  </h1>
+                </div>
+              </div>
+            </div>
+
+            {/* Título y descripción de categoría */}
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+              <p className="text-gray-500 mt-1 text-sm md:text-base leading-relaxed">
+                Equipamiento profesional para pesca. Calidad, precios competitivos y todo lo que necesitas para tu próxima aventura.
+              </p>
+            </div>
+
+            {/* Toolbar - filtros completos desde arriba */}
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6 p-4 border border-gray-200 rounded-2xl bg-white">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center rounded-lg border border-gray-200 p-1">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2 rounded-md transition-all ${
+                      viewMode === 'grid' ? 'bg-primary text-white' : 'text-gray-400 hover:bg-gray-100'
+                    }`}
+                    title="Vista cuadrícula"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded-md transition-all ${
+                      viewMode === 'list' ? 'bg-primary text-white' : 'text-gray-400 hover:bg-gray-100'
+                    }`}
+                    title="Vista lista"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+                <span className="text-gray-500 text-sm hidden sm:inline">Comparar (0)</span>
+                <span className="text-gray-400 text-sm">{sortedProducts.length} productos</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm text-gray-600">Ordenar:</label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  >
+                    <option value="default">Por defecto</option>
+                    <option value="price-asc">Precio ↑</option>
+                    <option value="price-desc">Precio ↓</option>
+                    <option value="name">Nombre</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm text-gray-600">Mostrar:</label>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1) }}
+                    className="px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  >
+                    {ITEMS_PER_PAGE_OPTIONS.map((n) => (
+                      <option key={n} value={n}>{n}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Grid */}
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {[...Array(9)].map((_, i) => (
