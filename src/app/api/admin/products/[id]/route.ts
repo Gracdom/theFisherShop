@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-function createSlug(name: string, sku: string): string {
-  const base = name
+function createSlug(name: string): string {
+  return name
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
-  return `${base}-${sku}`.substring(0, 100)
+    .substring(0, 100)
 }
 
 // PUT - Actualizar producto
@@ -47,7 +47,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Producto no encontrado' }, { status: 404 })
     }
 
-    const slug = createSlug(name, sku || existing.sku)
+    const slug = createSlug(name)
     const imgArray = Array.isArray(images) ? images : image ? [image] : existing.images
 
     const product = await prisma.product.update({

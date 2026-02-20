@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
-function createSlug(name: string, sku: string): string {
-  const base = name
+function createSlug(name: string): string {
+  return name
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
-  return `${base}-${sku}`.substring(0, 100)
+    .substring(0, 100)
 }
 
 // POST - Crear producto
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const slug = createSlug(name, sku)
+    const slug = createSlug(name)
     const imgArray = Array.isArray(images) ? images : image ? [image] : []
 
     const product = await prisma.product.create({

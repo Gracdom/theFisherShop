@@ -160,8 +160,7 @@ async function main() {
       }
 
       const name = (row.name || 'Sin nombre').trim()
-      const slugBase = createSlug(name)
-      const slug = `${slugBase}-${sku}`.substring(0, 100)
+      const slug = createSlug(name).substring(0, 100)
 
       const images: string[] = []
       const img = (row.images || '').trim()

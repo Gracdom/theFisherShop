@@ -41,15 +41,23 @@ export default function Header() {
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-center">
               <div className="flex gap-6 md:gap-8">
-                <span className="flex items-center gap-2 hover:text-blue-100 transition cursor-pointer">
-                  <i className="fas fa-phone text-blue-200"></i>
-                  <span className="hidden sm:inline">Llámanos: (+34) 912 345 678</span>
-                  <span className="sm:hidden">(+34) 912 345 678</span>
-                </span>
-                <span className="hidden md:flex items-center gap-2 hover:text-blue-100 transition cursor-pointer">
+                <a
+                  href="https://wa.me/34910202911"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 hover:text-blue-100 transition"
+                >
+                  <i className="fab fa-whatsapp text-blue-200"></i>
+                  <span className="hidden sm:inline">WhatsApp: +34 910 202 911</span>
+                  <span className="sm:hidden">+34 910 202 911</span>
+                </a>
+                <a
+                  href="mailto:info@thefishershop.com"
+                  className="hidden md:flex items-center gap-2 hover:text-blue-100 transition"
+                >
                   <i className="fas fa-envelope text-blue-200"></i>
                   info@thefishershop.com
-                </span>
+                </a>
               </div>
             </div>
           </div>
@@ -83,10 +91,9 @@ export default function Header() {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={`lg:hidden z-10 p-2 rounded-lg transition-colors ${
                 showTransparent 
-                  ? 'hover:bg-white/20' 
-                  : 'hover:bg-gray-100'
+                  ? 'hover:bg-white/20 text-white' 
+                  : 'hover:bg-gray-100 text-gray-900'
               }`}
-              style={{ color: '#072652' }}
               aria-label="Menú"
             >
               <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} text-xl`}></i>
@@ -98,51 +105,66 @@ export default function Header() {
                 <li>
                   <Link
                     href="/"
-                    className="py-2 font-semibold transition-colors relative group"
-                    style={{ color: '#072652' }}
+                    className={`py-2 font-semibold transition-colors relative group ${
+                      showTransparent ? 'text-white hover:text-white/90' : 'text-gray-900 hover:text-gray-700'
+                    }`}
                   >
                     Inicio
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300" style={{ backgroundColor: '#072652' }}></span>
+                    <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
+                      showTransparent ? 'bg-white' : 'bg-gray-900'
+                    }`}></span>
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/tienda"
-                    className="py-2 font-semibold transition-colors relative group"
-                    style={{ color: '#072652' }}
+                    className={`py-2 font-semibold transition-colors relative group ${
+                      showTransparent ? 'text-white hover:text-white/90' : 'text-gray-900 hover:text-gray-700'
+                    }`}
                   >
                     Tienda
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300" style={{ backgroundColor: '#072652' }}></span>
+                    <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
+                      showTransparent ? 'bg-white' : 'bg-gray-900'
+                    }`}></span>
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/contacto"
-                    className="py-2 font-semibold transition-colors relative group"
-                    style={{ color: '#072652' }}
+                    className={`py-2 font-semibold transition-colors relative group ${
+                      showTransparent ? 'text-white hover:text-white/90' : 'text-gray-900 hover:text-gray-700'
+                    }`}
                   >
                     Contacto
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300" style={{ backgroundColor: '#072652' }}></span>
+                    <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
+                      showTransparent ? 'bg-white' : 'bg-gray-900'
+                    }`}></span>
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/sobre-nosotros"
-                    className="py-2 font-semibold transition-colors relative group"
-                    style={{ color: '#072652' }}
+                    className={`py-2 font-semibold transition-colors relative group ${
+                      showTransparent ? 'text-white hover:text-white/90' : 'text-gray-900 hover:text-gray-700'
+                    }`}
                   >
                     Nosotros
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300" style={{ backgroundColor: '#072652' }}></span>
+                    <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
+                      showTransparent ? 'bg-white' : 'bg-gray-900'
+                    }`}></span>
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/faq"
-                    className="py-2 font-semibold transition-colors relative group"
-                    style={{ color: '#072652' }}
+                    className={`py-2 font-semibold transition-colors relative group ${
+                      showTransparent ? 'text-white hover:text-white/90' : 'text-gray-900 hover:text-gray-700'
+                    }`}
                   >
                     FAQ
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300" style={{ backgroundColor: '#072652' }}></span>
+                    <span className={`absolute bottom-0 left-0 w-0 h-0.5 group-hover:w-full transition-all duration-300 ${
+                      showTransparent ? 'bg-white' : 'bg-gray-900'
+                    }`}></span>
                   </Link>
                 </li>
               </ul>
@@ -153,10 +175,9 @@ export default function Header() {
               <button 
                 className={`p-1.5 rounded-lg transition-all hover:scale-110 ${
                   showTransparent 
-                    ? 'hover:bg-white/20' 
-                    : 'hover:bg-gray-100'
+                    ? 'hover:bg-white/20 text-white' 
+                    : 'hover:bg-gray-100 text-gray-900'
                 }`}
-                style={{ color: '#072652' }}
                 aria-label="Buscar"
               >
                 <i className="fas fa-search text-base"></i>
@@ -165,10 +186,9 @@ export default function Header() {
                 href="/favoritos" 
                 className={`p-1.5 rounded-lg transition-all hover:scale-110 ${
                   showTransparent 
-                    ? 'hover:bg-white/20' 
-                    : 'hover:bg-gray-100'
+                    ? 'hover:bg-white/20 text-white' 
+                    : 'hover:bg-gray-100 text-gray-900'
                 }`}
-                style={{ color: '#072652' }}
                 aria-label="Favoritos"
               >
                 <i className="far fa-heart text-base"></i>
@@ -177,17 +197,13 @@ export default function Header() {
                 onClick={() => setIsCartOpen(true)}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all hover:scale-105 relative ${
                   showTransparent 
-                    ? 'hover:bg-white/20 border' 
-                    : 'hover:bg-gray-100 border'
+                    ? 'hover:bg-white/20 text-white border border-white/30' 
+                    : 'hover:bg-gray-100 text-gray-900 border border-gray-200'
                 }`}
-                style={{ 
-                  color: '#072652',
-                  borderColor: showTransparent ? 'rgba(7, 38, 82, 0.3)' : 'rgba(7, 38, 82, 0.2)'
-                }}
               >
                 <i className="fas fa-shopping-cart text-base"></i>
                 {getTotalItems() > 0 && (
-                  <span className="absolute -top-1 -right-1 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center" style={{ backgroundColor: '#072652' }}>
+                  <span className="absolute -top-1 -right-1 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center bg-primary">
                     {getTotalItems()}
                   </span>
                 )}

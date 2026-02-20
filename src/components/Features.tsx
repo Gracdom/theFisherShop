@@ -23,19 +23,24 @@ const features = [
 
 export default function Features() {
   return (
-    <section className="py-12 bg-white border-t border-b border-gray-200">
+    <section className="py-10 lg:py-12 bg-white -mt-12 lg:-mt-16 relative z-20">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           {features.map((feature, index) => (
-            <div key={index} className="flex items-start gap-4">
-              <div className="w-14 h-14 flex-shrink-0 flex items-center justify-center">
-                <i className={`fas ${feature.icon} text-secondary text-4xl`}></i>
+            <div
+              key={index}
+              className="group flex items-center gap-4 p-5 lg:p-6 bg-white rounded-2xl shadow-lg border border-gray-100/80 hover:shadow-xl hover:border-primary/20 transition-all duration-300"
+            >
+              <div className="w-14 h-14 lg:w-16 lg:h-16 flex-shrink-0 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors duration-300">
+                <i className={`fas ${feature.icon} text-primary text-xl lg:text-2xl group-hover:text-white transition-colors`}></i>
               </div>
-              <div>
-                <h3 className="text-gray-900 font-bold text-base mb-1">
+              <div className="min-w-0">
+                <h3 className="text-gray-900 font-bold text-sm lg:text-base mb-0.5">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 text-sm">{feature.description}</p>
+                <p className="text-gray-500 text-xs lg:text-sm leading-snug">
+                  {feature.description}
+                </p>
               </div>
             </div>
           ))}

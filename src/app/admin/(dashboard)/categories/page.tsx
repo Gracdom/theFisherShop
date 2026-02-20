@@ -52,8 +52,8 @@ export default function AdminCategoriesPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">Categorías</h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">Categorías</h1>
+          <p className="text-gray-500 text-sm mt-1">
             {categories.length} categorías
           </p>
         </div>
@@ -74,20 +74,20 @@ export default function AdminCategoriesPage() {
           [...Array(6)].map((_, i) => (
             <div
               key={i}
-              className="h-24 bg-gray-800/50 rounded-xl animate-pulse"
+              className="h-24 bg-gray-100 rounded-xl animate-pulse"
             />
           ))
         ) : (
           categories.map((cat) => (
             <div
               key={cat.id}
-              className="p-4 bg-gray-900 border border-gray-800 rounded-xl flex items-center justify-between group"
+              className="p-4 bg-white border border-gray-200 rounded-xl flex items-center justify-between group hover:shadow-md transition"
             >
               <div>
-                <p className="font-medium text-white">{cat.name}</p>
+                <p className="font-medium text-gray-900">{cat.name}</p>
                 <p className="text-gray-500 text-sm">{cat.slug}</p>
                 {cat._count !== undefined && (
-                  <p className="text-gray-400 text-xs mt-1">
+                  <p className="text-gray-500 text-xs mt-1">
                     {cat._count.products} productos
                   </p>
                 )}
@@ -98,7 +98,7 @@ export default function AdminCategoriesPage() {
                     setEditingCategory(cat)
                     setModalOpen(true)
                   }}
-                  className="p-2 text-gray-400 hover:text-blue-400 hover:bg-gray-800 rounded-lg"
+                  className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
                   title="Editar"
                 >
                   <i className="fas fa-edit"></i>
@@ -107,7 +107,7 @@ export default function AdminCategoriesPage() {
                   onClick={() =>
                     handleDelete(cat.id, cat.name, cat._count?.products || 0)
                   }
-                  className="p-2 text-gray-400 hover:text-red-400 hover:bg-gray-800 rounded-lg"
+                  className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
                   title="Eliminar"
                 >
                   <i className="fas fa-trash"></i>

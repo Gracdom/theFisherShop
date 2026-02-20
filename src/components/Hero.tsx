@@ -9,7 +9,6 @@ const slides = [
     buttonText: "Explorar Equipamiento",
     buttonLink: "/tienda",
     features: ["Envío Gratis", "Calidad Premium", "Garantía Oficial"],
-    icon: "🎣"
   },
   {
     title: "Calidad que Confía el Pescador",
@@ -17,7 +16,6 @@ const slides = [
     buttonText: "Ver Productos",
     buttonLink: "/tienda",
     features: ["+500 Productos", "Expertos en Pesca", "Soporte 24/7"],
-    icon: "🐟"
   }
 ]
 
@@ -36,27 +34,39 @@ export default function Hero() {
     setCurrentSlide(index)
   }
 
-  // Generar estrellas decorativas
-  const stars = Array.from({ length: 15 }, (_, i) => ({
+  const bannerImages = ['/images/banner.webp', '/images/banner2.webp']
+
+  const stars = Array.from({ length: 12 }, (_, i) => ({
     id: i,
     top: `${Math.random() * 100}%`,
     left: `${Math.random() * 100}%`,
-    delay: Math.random() * 3,
-    size: Math.random() * 4 + 2
+    delay: Math.random() * 2,
+    size: Math.random() * 3 + 2
   }))
 
   return (
-    <section className="relative min-h-[500px] lg:min-h-[650px] flex items-center overflow-hidden -mt-24 pt-24"
-      style={{
-        backgroundImage: 'url("/images/banner.webp")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}>
+    <section className="relative min-h-[600px] lg:min-h-[780px] flex items-center overflow-hidden -mt-24 pt-24">
+      {/* Fondo con 2 imágenes que cambian según el slide */}
+      <div className="absolute inset-0">
+        {bannerImages.map((src, index) => (
+          <div
+            key={src}
+            className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+            style={{
+              backgroundImage: `url("${src}")`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              opacity: currentSlide === index ? 1 : 0,
+              zIndex: currentSlide === index ? 1 : 0,
+            }}
+          />
+        ))}
+      </div>
       
       {/* Overlay con gradiente */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 via-black/20 to-transparent z-[2]"></div>
       
-      {/* Estrellas decorativas animadas */}
+      {/* Estrellas decorativas */}
       {stars.map((star) => (
         <div
           key={star.id}
@@ -66,10 +76,9 @@ export default function Hero() {
             left: star.left,
             animationDelay: `${star.delay}s`,
             fontSize: `${star.size}px`,
-            filter: 'drop-shadow(0 0 3px rgba(255, 255, 0, 0.8))',
           }}
         >
-          ⭐
+          ★
         </div>
       ))}
       
@@ -87,72 +96,46 @@ export default function Hero() {
                 className="min-w-full px-4 lg:px-8 xl:px-16 py-12 lg:py-20"
               >
                 <div className="max-w-3xl text-left relative">
-                  {/* Icono decorativo grande */}
-                  <div className="absolute -top-4 -left-4 text-8xl opacity-20 animate-bounce" style={{ animationDuration: '3s' }}>
-                    {slide.icon}
-                  </div>
-                  
-                  {/* Badge destacado */}
-                  <div className="inline-flex items-center gap-2 bg-primary/90 backdrop-blur-sm text-white px-4 py-2 rounded-full mb-6 shadow-lg animate-fade-in">
-                    <i className="fas fa-star text-yellow-300"></i>
+                  {/* Badge */}
+                  <div className="inline-flex items-center gap-2 bg-primary/90 backdrop-blur-sm text-white px-5 py-2.5 rounded-full mb-6 shadow-lg">
+                    <i className="fas fa-star text-yellow-300 text-sm"></i>
                     <span className="text-sm font-semibold">Lo Mejor en Pesca</span>
                   </div>
                   
-                  {/* Título principal con efecto de brillo */}
+                  {/* Título */}
                   <h1 
-                    className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-white leading-tight relative"
-                    style={{
-                      textShadow: '4px 4px 8px rgba(0,0,0,0.8), 0 0 20px rgba(59, 130, 246, 0.3)',
-                      fontWeight: 900,
-                      letterSpacing: '-0.02em',
-                    }}
+                    className="text-5xl md:text-6xl lg:text-7xl font-bold mb-5 text-white leading-tight"
+                    style={{ textShadow: '2px 2px 12px rgba(0,0,0,0.8)' }}
                   >
-                    <span className="relative inline-block">
-                      {slide.title}
-                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></span>
-                    </span>
+                    {slide.title}
                   </h1>
                   
                   {/* Subtítulo */}
-                  <p 
-                    className="text-lg md:text-xl lg:text-2xl text-white/95 mb-6 max-w-2xl leading-relaxed"
-                    style={{
-                      textShadow: '2px 2px 4px rgba(0,0,0,0.7)',
-                    }}
-                  >
+                  <p className="text-lg md:text-xl text-white/95 mb-6 max-w-2xl leading-relaxed" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.6)' }}>
                     {slide.subtitle}
                   </p>
                   
-                  {/* Características destacadas */}
+                  {/* Características */}
                   <div className="flex flex-wrap gap-3 mb-8">
                     {slide.features.map((feature, idx) => (
                       <div 
                         key={idx}
-                        className="flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg border border-white/30 shadow-md hover:bg-white/30 transition-all duration-300"
+                        className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white px-4 py-2 rounded-lg border border-white/25"
                       >
-                        <i className="fas fa-check-circle text-green-300"></i>
+                        <i className="fas fa-check text-green-300 text-sm"></i>
                         <span className="text-sm font-medium">{feature}</span>
                       </div>
                     ))}
                   </div>
                   
-                  {/* Botón CTA mejorado */}
+                  {/* Botón CTA */}
                   <a
                     href={slide.buttonLink}
-                    className="group inline-flex items-center gap-3 bg-primary hover:bg-secondary text-white font-bold px-10 py-5 rounded-xl shadow-2xl transition-all duration-300 transform hover:scale-110 text-lg relative overflow-hidden"
-                    style={{
-                      boxShadow: '0 10px 30px rgba(59, 130, 246, 0.4)',
-                    }}
+                    className="inline-flex items-center gap-3 bg-primary hover:bg-primary/90 text-white font-bold px-8 py-4 rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
                   >
-                    <span className="relative z-10">{slide.buttonText}</span>
-                    <i className="fas fa-arrow-right ml-2 relative z-10 transform group-hover:translate-x-2 transition-transform"></i>
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    {slide.buttonText}
+                    <i className="fas fa-arrow-right text-sm"></i>
                   </a>
-                  
-                  {/* Elementos decorativos adicionales */}
-                  <div className="absolute -bottom-8 -right-8 text-6xl opacity-10 animate-float" style={{ animationDuration: '4s' }}>
-                    🎣
-                  </div>
                 </div>
               </div>
             ))}
@@ -185,30 +168,6 @@ export default function Hero() {
         <i className="fas fa-comments text-white text-2xl"></i>
       </button>
       
-      {/* Estilos de animación personalizados */}
-      <style jsx>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(5deg); }
-        }
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-shimmer {
-          animation: shimmer 3s infinite;
-        }
-        .animate-float {
-          animation: float 4s ease-in-out infinite;
-        }
-        .animate-fade-in {
-          animation: fade-in 0.6s ease-out;
-        }
-      `}</style>
     </section>
   )
 }

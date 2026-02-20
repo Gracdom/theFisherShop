@@ -4,10 +4,17 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 
+interface SubcategoryItem {
+  id: string
+  name: string
+  categoryId: string
+}
+
 interface ApiCategory {
   id: string
   name: string
   slug: string
+  subcategories?: SubcategoryItem[]
 }
 
 // Mapeo de nombres de categorías a imágenes disponibles
@@ -64,18 +71,45 @@ export default function Categories() {
   const [categories, setCategories] = useState<ApiCategory[]>([])
   const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const itemsToShow = 4
+  const itemsToShow = 5
 
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const { data, error } = await supabase
+        const { data: catData, error: catError } = await supabase
           .from('Category')
           .select('id, name, slug')
           .order('name')
 
-        if (error) throw error
-        setCategories(data || [])
+        if (catError) throw catError
+        const cats = catData || []
+
+        let subData: SubcategoryItem[] = []
+        try {
+          const { data } = await supabase
+            .from('Subcategory')
+            .select('id, name, categoryId')
+            .order('name')
+          subData = data || []
+        } catch {
+          /* Subcategory opcional */
+        }
+
+        const subByCat = subData.reduce<Record<string, SubcategoryItem[]>>(
+          (acc, s) => {
+            if (!acc[s.categoryId]) acc[s.categoryId] = []
+            acc[s.categoryId].push(s)
+            return acc
+          },
+          {}
+        )
+
+        setCategories(
+          cats.map((c) => ({
+            ...c,
+            subcategories: (subByCat[c.id] || []).slice(0, 2),
+          }))
+        )
       } catch {
         setCategories([])
       } finally {
@@ -105,8 +139,8 @@ export default function Categories() {
     return (
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[...Array(4)].map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+            {[...Array(5)].map((_, i) => (
               <div key={i} className="text-center">
                 <div className="w-48 h-48 mx-auto mb-4 bg-gray-100 rounded-full animate-pulse" />
                 <div className="h-6 bg-gray-100 rounded animate-pulse mb-3 mx-auto w-32" />
@@ -139,30 +173,47 @@ export default function Categories() {
           )}
 
           {/* Contenedor del carrusel */}
-          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 ${canNavigate ? 'px-8' : ''}`}>
-            {visibleCategories.map((category) => (
-              <a
-                key={category.id}
-                href={`/tienda?categoria=${category.slug}`}
-                className="text-center group cursor-pointer block"
-              >
-                <div className="relative w-48 h-48 mx-auto mb-4 rounded-full overflow-hidden bg-gray-100 group-hover:shadow-xl transition-all duration-300 border-4 border-gray-200 group-hover:border-primary">
-                  <Image
-                    src={getImageForCategory(category.name)}
-                    alt={category.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-300"
-                    sizes="(max-width: 640px) 192px, (max-width: 1024px) 192px, 192px"
-                  />
-                </div>
-                <h3 className="text-gray-900 font-semibold text-lg mb-3 group-hover:text-primary transition-colors">
-                  {category.name}
-                </h3>
-                <span className="inline-block bg-primary text-white px-6 py-2 rounded-full text-sm hover:bg-secondary transition font-semibold">
-                  Ver Más
-                </span>
-              </a>
-            ))}
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 ${canNavigate ? 'px-8' : ''}`}>
+            {visibleCategories.map((category) => {
+              const subcats = category.subcategories || []
+              return (
+                <a
+                  key={category.id}
+                  href={`/tienda?categoria=${category.slug}`}
+                  className="flex flex-col items-center gap-4 group cursor-pointer block"
+                >
+                  <div className="relative w-48 h-48 rounded-full overflow-hidden bg-gray-100 shadow-[0_8px_15px_-3px_rgba(0,0,0,0.08)] group-hover:shadow-[0_8px_20px_-3px_rgba(0,0,0,0.12)] transition-all duration-300">
+                    <Image
+                      src={getImageForCategory(category.name)}
+                      alt={category.name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-300"
+                      sizes="(max-width: 640px) 192px, (max-width: 1024px) 192px, 192px"
+                    />
+                  </div>
+                  <h3 className="font-serif text-gray-900 font-medium text-xl text-center">
+                    {category.name}
+                  </h3>
+                  <div className="flex flex-col items-center gap-1">
+                    {subcats.length >= 2 ? (
+                      subcats.map((s) => (
+                        <p key={s.id} className="text-sm text-gray-500 font-sans">
+                          - {s.name}
+                        </p>
+                      ))
+                    ) : (
+                      <>
+                        <p className="text-sm text-gray-500 font-sans">- Subcategoría 1</p>
+                        <p className="text-sm text-gray-500 font-sans">- Subcategoría 2</p>
+                      </>
+                    )}
+                  </div>
+                  <span className="inline-block bg-[#0B2A51] hover:bg-blue-950 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors border-none">
+                    Ver Todo
+                  </span>
+                </a>
+              )
+            })}
           </div>
 
           {/* Botón siguiente */}

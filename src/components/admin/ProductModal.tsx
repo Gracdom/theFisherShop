@@ -132,15 +132,15 @@ export default function ProductModal({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-      <div className="bg-gray-900 border border-gray-800 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-800 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+      <div className="bg-white border border-gray-200 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl">
+        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-xl font-bold text-gray-900">
             {product ? 'Editar producto' : 'Nuevo producto'}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white"
+            className="text-gray-500 hover:text-gray-900"
           >
             <i className="fas fa-times text-xl"></i>
           </button>
@@ -148,33 +148,33 @@ export default function ProductModal({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
               {error}
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 SKU *
               </label>
               <input
                 type="text"
                 value={form.sku}
                 onChange={(e) => setForm({ ...form, sku: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900"
                 required
                 disabled={!!product}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Categoría *
               </label>
               <select
                 value={form.categoryId}
                 onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900"
                 required
               >
                 <option value="">Seleccionar...</option>
@@ -188,33 +188,33 @@ export default function ProductModal({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Nombre *
             </label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Descripción
             </label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900"
               rows={3}
             />
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Precio (€) *
               </label>
               <input
@@ -222,12 +222,12 @@ export default function ProductModal({
                 step="0.01"
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Precio anterior (€)
               </label>
               <input
@@ -235,31 +235,31 @@ export default function ProductModal({
                 step="0.01"
                 value={form.oldPrice}
                 onChange={(e) => setForm({ ...form, oldPrice: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Stock
               </label>
               <input
                 type="number"
                 value={form.stock}
                 onChange={(e) => setForm({ ...form, stock: e.target.value })}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               URL imagen
             </label>
             <input
               type="url"
               value={form.image}
               onChange={(e) => setForm({ ...form, image: e.target.value })}
-              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white"
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900"
               placeholder="https://..."
             />
           </div>
@@ -270,18 +270,18 @@ export default function ProductModal({
                 type="checkbox"
                 checked={form.featured}
                 onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                className="rounded border-gray-600 bg-gray-800 text-blue-500"
+                className="rounded border-gray-300 text-blue-600"
               />
-              <span className="text-gray-300">Destacado</span>
+              <span className="text-gray-700">Destacado</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={form.trending}
                 onChange={(e) => setForm({ ...form, trending: e.target.checked })}
-                className="rounded border-gray-600 bg-gray-800 text-blue-500"
+                className="rounded border-gray-300 text-blue-600"
               />
-              <span className="text-gray-300">Tendencia</span>
+              <span className="text-gray-700">Tendencia</span>
             </label>
           </div>
 
@@ -289,7 +289,7 @@ export default function ProductModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-400 hover:text-white"
+              className="px-4 py-2 text-gray-600 hover:text-gray-900"
             >
               Cancelar
             </button>

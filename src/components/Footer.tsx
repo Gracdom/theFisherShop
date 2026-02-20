@@ -1,149 +1,289 @@
+'use client'
+
 import Link from 'next/link'
-import Image from 'next/image'
+import { useState } from 'react'
+import { Playfair_Display } from 'next/font/google'
+
+const playfair = Playfair_Display({ subsets: ['latin'], weight: ['600', '700'] })
+
+const STORE = {
+  name: 'The Fisher Shop',
+  email: 'info@thefishershop.com',
+  whatsapp: '34910202911',
+  whatsappDisplay: '+34 910 202 911',
+}
+
+const blogPosts = [
+  {
+    id: 1,
+    title: 'Mejores técnicas de pesca con mosca en agua dulce',
+    excerpt: 'Guía práctica para principiantes...',
+    date: '15 Ene, 2025',
+    href: '/blog/tecnicas-pesca-mosca',
+    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=120&h=80&fit=crop',
+  },
+  {
+    id: 2,
+    title: 'Cómo elegir la caña de pescar ideal',
+    excerpt: 'Tamaño, material y potencia según el tipo de pesca...',
+    date: '8 Ene, 2025',
+    href: '/blog/elegir-cana-pescar',
+    image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=120&h=80&fit=crop',
+  },
+  {
+    id: 3,
+    title: 'Mantenimiento de carretes de pesca',
+    excerpt: 'Limpieza y conservación para prolongar su vida útil...',
+    date: '20 Dic, 2024',
+    href: '/blog/mantenimiento-carretes',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=80&fit=crop',
+  },
+  {
+    id: 4,
+    title: 'Señuelos más efectivos para pesca en mar',
+    excerpt: 'Tipos de señuelos según la temporada y la especie...',
+    date: '5 Dic, 2024',
+    href: '/blog/senuelos-pesca-mar',
+    image: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=120&h=80&fit=crop',
+  },
+]
+
+const infoLinks = [
+  { href: '/sobre-nosotros', label: 'Sobre nosotros' },
+  { href: '/informacion-envio', label: 'Información de envío' },
+  { href: '/privacidad', label: 'Política de privacidad' },
+  { href: '/terminos', label: 'Términos y condiciones' },
+  { href: '/contacto', label: 'Contacto' },
+  { href: '/faq', label: 'Preguntas frecuentes' },
+]
+
+const accountLinks = [
+  { href: '/tienda', label: 'Tienda' },
+  { href: '/carrito', label: 'Carrito' },
+  { href: '/checkout', label: 'Checkout' },
+  { href: '/contacto', label: 'Atención al cliente' },
+  { href: '/faq', label: 'FAQ' },
+]
+
+const socialLinks = [
+  { href: 'https://facebook.com', label: 'Facebook', icon: 'fab fa-facebook-f' },
+  { href: 'https://x.com', label: 'X', icon: 'fab fa-x-twitter' },
+  { href: 'https://youtube.com', label: 'YouTube', icon: 'fab fa-youtube' },
+  { href: 'https://instagram.com', label: 'Instagram', icon: 'fab fa-instagram' },
+  { href: 'https://pinterest.com', label: 'Pinterest', icon: 'fab fa-pinterest-p' },
+]
 
 export default function Footer() {
+  const [email, setEmail] = useState('')
+  const [blogPage, setBlogPage] = useState(0)
+  const visibleBlogPosts = blogPosts.slice(blogPage * 2, blogPage * 2 + 2)
+
+  const handleNewsletter = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (email) {
+      setEmail('')
+    }
+  }
+
   return (
-    <footer className="bg-gray-900 text-white pt-16 pb-8 relative">
-      {/* Wave decoration */}
-      <div className="absolute top-0 left-0 w-full overflow-hidden leading-none">
-        <svg className="relative block w-full h-12" viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#f3f4f6"></path>
-        </svg>
-      </div>
-      
-      <div className="container mx-auto px-4 mt-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
-          {/* Column 1 - About */}
-          <div>
-            <Link href="/" className="inline-block mb-4">
-              <Image
-                src="/logo.png"
-                alt="Escamar Pesca - Equipamiento de pesca profesional"
-                width={180}
-                height={45}
-                className="h-11 w-auto"
-              />
-            </Link>
-            <p className="text-gray-400 mb-6 leading-relaxed text-sm">
-              Tu tienda online de confianza para todo tipo de equipo de pesca.
-              Calidad profesional al mejor precio.
-            </p>
-            <div className="flex gap-3">
-              <a
-                href="#"
-                className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-secondary transition"
-              >
-                <i className="fab fa-facebook text-sm"></i>
-              </a>
-              <a
-                href="#"
-                className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-secondary transition"
-              >
-                <i className="fab fa-instagram text-sm"></i>
-              </a>
-              <a
-                href="#"
-                className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-secondary transition"
-              >
-                <i className="fab fa-twitter text-sm"></i>
-              </a>
-              <a
-                href="#"
-                className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-secondary transition"
-              >
-                <i className="fab fa-youtube text-sm"></i>
-              </a>
+    <footer className="bg-primary text-white border-t border-primary">
+      {/* 1. Newsletter */}
+      <div className="border-b border-white/20">
+        <div className="container mx-auto px-4 py-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                <i className="fas fa-envelope text-white text-lg"></i>
+              </div>
+              <div>
+                <h3 className="font-bold text-white text-lg">Suscríbete a nuestra newsletter</h3>
+                <p className="text-white/80 text-sm">No te pierdas ofertas y novedades</p>
+              </div>
             </div>
-          </div>
-
-          {/* Column 2 - Information */}
-          <div>
-            <h4 className="text-base font-bold mb-4">Información</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/sobre-nosotros" className="text-gray-400 hover:text-secondary transition">
-                  Sobre nosotros
-                </Link>
-              </li>
-              <li>
-                <Link href="/tienda" className="text-gray-400 hover:text-secondary transition">
-                  Tienda
-                </Link>
-              </li>
-              <li>
-                <Link href="/contacto" className="text-gray-400 hover:text-secondary transition">
-                  Contacto
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="text-gray-400 hover:text-secondary transition">
-                  FAQ
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 3 - Customer Service */}
-          <div>
-            <h4 className="text-base font-bold mb-4">Atención al cliente</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/carrito" className="text-gray-400 hover:text-secondary transition">
-                  Carrito
-                </Link>
-              </li>
-              <li>
-                <Link href="/checkout" className="text-gray-400 hover:text-secondary transition">
-                  Checkout
-                </Link>
-              </li>
-              <li>
-                <Link href="/terminos" className="text-gray-400 hover:text-secondary transition">
-                  Términos y condiciones
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="text-gray-400 hover:text-secondary transition">
-                  Preguntas frecuentes
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 4 - Contact */}
-          <div>
-            <h4 className="text-base font-bold mb-4">Contacto</h4>
-            <ul className="space-y-3 text-gray-400 text-sm">
-              <li className="flex items-start gap-2">
-                <i className="fas fa-map-marker-alt text-secondary mt-1 text-xs"></i>
-                <span>Calle del Puerto 123, Madrid 28001</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <i className="fas fa-phone text-secondary mt-1 text-xs"></i>
-                <span>(+34) 912 345 678</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <i className="fas fa-envelope text-secondary mt-1 text-xs"></i>
-                <span>info@escamarpesca.com</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <i className="fas fa-clock text-secondary mt-1 text-xs"></i>
-                <span>Lun-Vie: 9:00 - 18:00</span>
-              </li>
-            </ul>
+            <form onSubmit={handleNewsletter} className="flex w-full lg:w-auto max-w-md">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Introduce tu email"
+                className="flex-1 px-5 py-3 border border-white/30 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-white/50 bg-white/10 text-white placeholder-white/60"
+              />
+              <button
+                type="submit"
+                className="px-6 py-3 bg-secondary hover:bg-white hover:text-primary text-white font-semibold rounded-r-lg transition-colors"
+              >
+                Suscribirse
+              </button>
+            </form>
           </div>
         </div>
+      </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-gray-500 text-xs">
-            &copy; {new Date().getFullYear()} Escamar Pesca. Todos los derechos reservados.
-          </p>
-          <div className="flex gap-4 text-2xl text-gray-600">
-            <i className="fab fa-cc-visa hover:text-secondary transition"></i>
-            <i className="fab fa-cc-mastercard hover:text-secondary transition"></i>
-            <i className="fab fa-cc-paypal hover:text-secondary transition"></i>
-            <i className="fab fa-cc-amex hover:text-secondary transition"></i>
+      {/* 2. 4 columnas */}
+      <div className="container mx-auto px-4 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+          {/* Columna 1 - Store Information */}
+          <div>
+            <h5 className={`${playfair.className} font-semibold text-white mb-5 text-base`}>
+              Información de la tienda
+            </h5>
+            <ul className="space-y-4 text-white/80 text-sm">
+              <li className="flex gap-3">
+                <i className="fab fa-whatsapp text-secondary mt-0.5 flex-shrink-0 text-lg"></i>
+                <a
+                  href={`https://wa.me/${STORE.whatsapp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition"
+                >
+                  {STORE.whatsappDisplay}
+                </a>
+              </li>
+              <li className="flex gap-3">
+                <i className="fas fa-envelope text-secondary mt-0.5 flex-shrink-0"></i>
+                <a href={`mailto:${STORE.email}`} className="hover:text-white transition">
+                  {STORE.email}
+                </a>
+              </li>
+              <li className="mt-5 p-4 bg-white/10 rounded-lg border border-white/20">
+                <div className="flex gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <i className="fab fa-whatsapp text-secondary text-xl"></i>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-white text-sm">¿Necesitas ayuda? Escríbenos por WhatsApp</p>
+                    <a
+                      href={`https://wa.me/${STORE.whatsapp}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-secondary font-bold hover:text-white transition"
+                    >
+                      {STORE.whatsappDisplay}
+                    </a>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          {/* Columna 2 - Information */}
+          <div>
+            <h5 className={`${playfair.className} font-semibold text-white mb-5 text-base`}>
+              Información
+            </h5>
+            <ul className="space-y-2.5 text-sm">
+              {infoLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-white/80 hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Columna 3 - My Account */}
+          <div>
+            <h5 className={`${playfair.className} font-semibold text-white mb-5 text-base`}>
+              Tu cuenta
+            </h5>
+            <ul className="space-y-2.5 text-sm">
+              {accountLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-white/80 hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Columna 4 - Our Blog */}
+          <div>
+            <div className="flex items-center justify-between mb-5">
+              <h5 className={`${playfair.className} font-semibold text-white text-base`}>
+                Nuestro blog
+              </h5>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setBlogPage((p) => Math.max(0, p - 1))}
+                  disabled={blogPage === 0}
+                  className="w-8 h-8 rounded border border-white/30 flex items-center justify-center text-white/80 hover:border-secondary hover:text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Previous"
+                >
+                  <i className="fas fa-chevron-left text-xs"></i>
+                </button>
+                <button
+                  onClick={() => setBlogPage((p) => Math.min(1, p + 1))}
+                  disabled={blogPage >= 1}
+                  className="w-8 h-8 rounded border border-white/30 flex items-center justify-center text-white/80 hover:border-secondary hover:text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Next"
+                >
+                  <i className="fas fa-chevron-right text-xs"></i>
+                </button>
+              </div>
+            </div>
+            <div className="space-y-4">
+              {visibleBlogPosts.map((post) => (
+                <Link
+                  key={post.id}
+                  href={post.href}
+                  className="flex gap-3 group"
+                >
+                  <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-white/10">
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-white text-sm mb-0.5 group-hover:text-secondary transition line-clamp-2">
+                      {post.title}
+                    </h4>
+                    <p className="text-white/70 text-xs mb-1 line-clamp-1">{post.excerpt}</p>
+                    <div className="flex items-center gap-1.5 text-white/60 text-xs">
+                      <i className="far fa-calendar-alt"></i>
+                      <span>{post.date}</span>
+                    </div>
+                    <span className="text-secondary text-xs font-medium group-hover:underline">
+                      Leer más
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Copyright y redes */}
+      <div className="border-t border-white/20 py-6">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-white/70 text-sm text-center md:text-left">
+              © {new Date().getFullYear()} {STORE.name}. Todos los derechos reservados.
+            </p>
+            <div className="flex gap-3">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.icon}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-full border border-white/30 flex items-center justify-center text-white/80 hover:text-white hover:border-secondary transition-colors"
+                  aria-label={social.label}
+                >
+                  <i className={`${social.icon} text-sm`}></i>
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </div>

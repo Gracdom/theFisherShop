@@ -54,8 +54,8 @@ export default function AdminProductsPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">Productos</h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-gray-900">Productos</h1>
+          <p className="text-gray-500 text-sm mt-1">
             {products.length} productos en catálogo
           </p>
         </div>
@@ -71,7 +71,7 @@ export default function AdminProductsPage() {
         </button>
       </div>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
         {loading ? (
           <div className="p-12 text-center text-gray-500">Cargando...</div>
         ) : products.length === 0 ? (
@@ -79,7 +79,7 @@ export default function AdminProductsPage() {
             <p className="mb-4">No hay productos.</p>
             <button
               onClick={() => setModalOpen(true)}
-              className="text-blue-400 hover:text-blue-300"
+              className="text-blue-600 hover:text-blue-700 font-medium"
             >
               Crear el primero
             </button>
@@ -88,26 +88,26 @@ export default function AdminProductsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-800">
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
                     Producto
                   </th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
                     SKU
                   </th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
                     Categoría
                   </th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
                     Precio
                   </th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
                     Stock
                   </th>
-                  <th className="text-left py-4 px-6 text-gray-400 font-medium text-sm">
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm">
                     Estado
                   </th>
-                  <th className="text-right py-4 px-6 text-gray-400 font-medium text-sm">
+                  <th className="text-right py-4 px-6 text-gray-600 font-medium text-sm">
                     Acciones
                   </th>
                 </tr>
@@ -116,7 +116,7 @@ export default function AdminProductsPage() {
                 {products.map((p) => (
                   <tr
                     key={p.id}
-                    className="border-b border-gray-800 hover:bg-gray-800/30"
+                    className="border-b border-gray-100 hover:bg-gray-50"
                   >
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
@@ -124,31 +124,31 @@ export default function AdminProductsPage() {
                           <img
                             src={p.image}
                             alt=""
-                            className="w-12 h-12 rounded-lg object-cover bg-gray-800"
+                            className="w-12 h-12 rounded-lg object-cover bg-gray-100"
                           />
                         ) : (
-                          <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center">
-                            <i className="fas fa-image text-gray-600"></i>
+                          <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                            <i className="fas fa-image text-gray-400"></i>
                           </div>
                         )}
-                        <span className="text-white font-medium line-clamp-1 max-w-[200px]">
+                        <span className="text-gray-900 font-medium line-clamp-1 max-w-[200px]">
                           {p.name}
                         </span>
                       </div>
                     </td>
-                    <td className="py-4 px-6 text-gray-400 text-sm font-mono">
+                    <td className="py-4 px-6 text-gray-500 text-sm font-mono">
                       {p.sku}
                     </td>
-                    <td className="py-4 px-6 text-gray-400 text-sm">
+                    <td className="py-4 px-6 text-gray-500 text-sm">
                       {p.category?.name || '-'}
                     </td>
-                    <td className="py-4 px-6 text-white font-medium">
+                    <td className="py-4 px-6 text-gray-900 font-medium">
                       €{p.price.toFixed(2)}
                     </td>
                     <td className="py-4 px-6">
                       <span
                         className={
-                          p.stock === 0 ? 'text-red-400' : 'text-gray-300'
+                          p.stock === 0 ? 'text-red-600' : 'text-gray-600'
                         }
                       >
                         {p.stock}
@@ -157,12 +157,12 @@ export default function AdminProductsPage() {
                     <td className="py-4 px-6">
                       <div className="flex gap-1 flex-wrap">
                         {p.featured && (
-                          <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded text-xs">
+                          <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-xs">
                             Destacado
                           </span>
                         )}
                         {p.trending && (
-                          <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 rounded text-xs">
+                          <span className="px-2 py-0.5 bg-amber-50 text-amber-600 rounded text-xs">
                             Tendencia
                           </span>
                         )}
@@ -175,14 +175,14 @@ export default function AdminProductsPage() {
                             setEditingProduct(p)
                             setModalOpen(true)
                           }}
-                          className="p-2 text-gray-400 hover:text-blue-400 hover:bg-gray-800 rounded-lg transition"
+                          className="p-2 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition"
                           title="Editar"
                         >
                           <i className="fas fa-edit"></i>
                         </button>
                         <button
                           onClick={() => handleDelete(p.id, p.name)}
-                          className="p-2 text-gray-400 hover:text-red-400 hover:bg-gray-800 rounded-lg transition"
+                          className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
                           title="Eliminar"
                         >
                           <i className="fas fa-trash"></i>

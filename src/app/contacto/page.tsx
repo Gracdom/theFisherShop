@@ -20,24 +20,24 @@ export default function ContactoPage() {
 
         <div className="grid md:grid-cols-2 gap-12">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Información</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Contacto</h2>
             <div className="space-y-4 text-gray-600">
-              <div className="flex gap-3">
-                <i className="fas fa-map-marker-alt text-primary mt-1"></i>
-                <span>123 Marina Street, Madrid 28001</span>
-              </div>
-              <div className="flex gap-3">
-                <i className="fas fa-phone text-primary mt-1"></i>
-                <span>(+34) 912 345 678</span>
-              </div>
-              <div className="flex gap-3">
+              <a
+                href="https://wa.me/34910202911"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex gap-3 hover:text-primary transition"
+              >
+                <i className="fab fa-whatsapp text-primary mt-1 text-xl"></i>
+                <span>+34 910 202 911</span>
+              </a>
+              <a
+                href="mailto:info@thefishershop.com"
+                className="flex gap-3 hover:text-primary transition"
+              >
                 <i className="fas fa-envelope text-primary mt-1"></i>
                 <span>info@thefishershop.com</span>
-              </div>
-              <div className="flex gap-3">
-                <i className="fas fa-clock text-primary mt-1"></i>
-                <span>Lun - Vie: 9:00 - 18:00</span>
-              </div>
+              </a>
             </div>
           </div>
 

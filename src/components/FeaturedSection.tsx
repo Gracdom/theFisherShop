@@ -3,7 +3,7 @@ export default function FeaturedSection() {
     <section className="py-20 bg-gradient-to-br from-blue-50 to-white relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-2 gap-16 items-center">
-          <div>
+          <div className="pl-8 md:pl-12 lg:pl-16">
             <h2 className="text-5xl font-bold text-gray-900 mb-6">
               Pesca en <span className="text-secondary">agua dulce</span>
             </h2>

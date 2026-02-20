@@ -21,13 +21,13 @@ export default function AdminSidebar() {
   }
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-gray-900 border-r border-gray-800 flex flex-col">
-      <div className="p-6 border-b border-gray-800">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm">
+      <div className="p-6 border-b border-gray-200">
         <Link href="/admin" className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center">
             <i className="fas fa-fish text-white text-sm"></i>
           </div>
-          <span className="font-bold text-white">FisherShop</span>
+          <span className="font-bold text-gray-900">FisherShop</span>
         </Link>
         <p className="text-gray-500 text-xs mt-1">Panel de administración</p>
       </div>
@@ -41,8 +41,8 @@ export default function AdminSidebar() {
               href={item.href}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                 isActive
-                  ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
-                  : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
               }`}
             >
               <i className={`fas ${item.icon} w-5 text-center`}></i>
@@ -52,18 +52,18 @@ export default function AdminSidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-gray-800">
+      <div className="p-4 border-t border-gray-200">
         <Link
           href="/"
           target="_blank"
-          className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition mb-2"
+          className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition mb-2"
         >
           <i className="fas fa-external-link-alt w-5 text-center"></i>
           Ver tienda
         </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition"
         >
           <i className="fas fa-sign-out-alt w-5 text-center"></i>
           Cerrar sesión

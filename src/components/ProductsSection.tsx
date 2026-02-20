@@ -47,9 +47,12 @@ function mapApiProductToCard(p: ApiProduct): Product {
   }
 }
 
+const PRODUCTS_PER_PAGE = 8 // 4 columnas x 2 filas
+
 export default function ProductsSection() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(0)
   const searchParams = useSearchParams()
   const categorySlug = searchParams.get('category')
 
@@ -76,6 +79,7 @@ export default function ProductsSection() {
 
         if (error) throw error
         setProducts((data || []).map(mapApiProductToCard))
+        setCurrentPage(0)
       } catch {
         setProducts([])
       } finally {
@@ -92,7 +96,7 @@ export default function ProductsSection() {
           <h2 className="text-4xl font-bold text-gray-900 mb-3">
             Productos destacados
           </h2>
-          <div className="flex justify-center text-secondary text-xl gap-1">
+          <div className="flex justify-center text-yellow-400 text-xl gap-1">
             <i className="fas fa-star"></i>
             <i className="fas fa-star"></i>
             <i className="fas fa-star"></i>
@@ -102,7 +106,7 @@ export default function ProductsSection() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
@@ -117,11 +121,69 @@ export default function ProductsSection() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+            <div className="relative flex items-center gap-4">
+              {/* Flecha izquierda */}
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                disabled={currentPage === 0}
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 z-10 w-12 h-12 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                aria-label="Productos anteriores"
+              >
+                <i className="fas fa-chevron-left"></i>
+              </button>
+
+              {/* Grid 4 columnas x 2 filas */}
+              <div className="flex-1 overflow-hidden px-12 md:px-16">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  {products
+                    .slice(
+                      currentPage * PRODUCTS_PER_PAGE,
+                      currentPage * PRODUCTS_PER_PAGE + PRODUCTS_PER_PAGE
+                    )
+                    .map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))}
+                </div>
+              </div>
+
+              {/* Flecha derecha */}
+              <button
+                onClick={() =>
+                  setCurrentPage((p) =>
+                    Math.min(
+                      Math.ceil(products.length / PRODUCTS_PER_PAGE) - 1,
+                      p + 1
+                    )
+                  )
+                }
+                disabled={
+                  currentPage >= Math.ceil(products.length / PRODUCTS_PER_PAGE) - 1
+                }
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 z-10 w-12 h-12 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                aria-label="Siguientes productos"
+              >
+                <i className="fas fa-chevron-right"></i>
+              </button>
             </div>
+
+            {/* Indicador de página */}
+            {Math.ceil(products.length / PRODUCTS_PER_PAGE) > 1 && (
+              <div className="flex justify-center gap-2 mt-6">
+                {Array.from({
+                  length: Math.ceil(products.length / PRODUCTS_PER_PAGE),
+                }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i)}
+                    className={`w-2.5 h-2.5 rounded-full transition ${
+                      i === currentPage ? 'bg-primary' : 'bg-gray-300'
+                    }`}
+                    aria-label={`Página ${i + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+
             <div className="text-center mt-12">
               <Link
                 href="/tienda"
