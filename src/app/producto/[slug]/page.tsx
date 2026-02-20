@@ -106,8 +106,6 @@ export default function ProductoPage() {
     )
   }
 
-  const mainImage = product.image || product.images?.[0]
-
   return (
     <div className="py-12 bg-white">
       <div className="container mx-auto px-4">
