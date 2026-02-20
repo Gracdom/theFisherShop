@@ -115,9 +115,19 @@ export default function Categories() {
 
   if (loading) {
     return (
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+      <section className="py-8 sm:py-16 bg-white">
+        <div className="container mx-auto px-3 sm:px-4">
+          {/* Móvil: skeleton horizontal */}
+          <div className="flex gap-3 overflow-hidden sm:hidden">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-28">
+                <div className="w-24 h-24 mx-auto mb-2 bg-gray-100 rounded-full animate-pulse" />
+                <div className="h-4 bg-gray-100 rounded animate-pulse mx-auto w-20" />
+              </div>
+            ))}
+          </div>
+          {/* Desktop: skeleton grid */}
+          <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-5 gap-8">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="text-center">
                 <div className="w-48 h-48 mx-auto mb-4 bg-gray-100 rounded-full animate-pulse" />
@@ -136,9 +146,46 @@ export default function Categories() {
   }
 
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="relative">
+    <section className="py-6 sm:py-16 bg-white">
+      <div className="container mx-auto px-0 sm:px-4">
+        {/* MÓVIL: Carrusel horizontal scrollable */}
+        <div className="sm:hidden">
+          <div className="flex gap-2 overflow-x-auto px-3 pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/tienda?categoria=${category.slug}`}
+                className="flex-shrink-0 w-[100px] snap-start"
+              >
+                <div className="flex flex-col items-center group">
+                  <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gray-100 shadow-md group-active:scale-95 transition-transform mb-2">
+                    <Image
+                      src={getImageForCategory(category.name)}
+                      alt={category.name}
+                      fill
+                      className="object-cover"
+                      sizes="80px"
+                    />
+                  </div>
+                  <h3 className="font-sans text-gray-900 font-semibold text-[11px] text-center leading-tight line-clamp-2 px-1">
+                    {category.name}
+                  </h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {/* Indicador de scroll */}
+          <div className="flex justify-center gap-1 mt-1">
+            <span className="text-[10px] text-gray-400 flex items-center gap-1">
+              <i className="fas fa-chevron-left text-[8px]"></i>
+              Desliza
+              <i className="fas fa-chevron-right text-[8px]"></i>
+            </span>
+          </div>
+        </div>
+
+        {/* TABLET Y DESKTOP: Grid con carrusel */}
+        <div className="hidden sm:block relative">
           {/* Botón anterior */}
           {canNavigate && currentIndex > 0 && (
             <button
@@ -151,7 +198,7 @@ export default function Categories() {
           )}
 
           {/* Contenedor del carrusel */}
-          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 ${canNavigate ? 'px-8' : ''}`}>
+          <div className={`grid sm:grid-cols-2 lg:grid-cols-5 gap-8 ${canNavigate ? 'px-8' : ''}`}>
             {visibleCategories.map((category) => {
               const subcats = category.subcategories || []
               return (
@@ -210,25 +257,25 @@ export default function Categories() {
               <i className="fas fa-chevron-right text-gray-700 text-xl"></i>
             </button>
           )}
-        </div>
 
-        {/* Indicadores de posición */}
-        {canNavigate && (
-          <div className="flex justify-center items-center gap-2 mt-8">
-            {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentIndex
-                    ? 'bg-primary w-8'
-                    : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-                aria-label={`Ir a categoría ${index + 1}`}
-              />
-            ))}
-          </div>
-        )}
+          {/* Indicadores de posición */}
+          {canNavigate && (
+            <div className="flex justify-center items-center gap-2 mt-8">
+              {Array.from({ length: maxIndex + 1 }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentIndex
+                      ? 'bg-primary w-8'
+                      : 'bg-gray-300 hover:bg-gray-400'
+                  }`}
+                  aria-label={`Ir a categoría ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   )

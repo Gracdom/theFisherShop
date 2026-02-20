@@ -74,6 +74,7 @@ export default function Footer() {
   const [email, setEmail] = useState('')
   const [blogPage, setBlogPage] = useState(0)
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [openSection, setOpenSection] = useState<string | null>(null)
   const visibleBlogPosts = blogPosts.slice(blogPage * 2, blogPage * 2 + 2)
 
   const handleNewsletter = async (e: React.FormEvent) => {
@@ -98,19 +99,23 @@ export default function Footer() {
     }
   }
 
+  const toggleSection = (section: string) => {
+    setOpenSection(openSection === section ? null : section)
+  }
+
   return (
     <footer className="font-sans bg-primary text-white border-t border-primary">
-      {/* 1. Newsletter */}
+      {/* 1. Newsletter - Compacto en móvil */}
       <div className="border-b border-white/20">
-        <div className="container mx-auto px-4 py-10">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
-                <i className="fas fa-envelope text-white text-lg"></i>
+        <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-4 sm:gap-6">
+            <div className="flex items-center gap-3 sm:gap-4 w-full lg:w-auto">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                <i className="fas fa-envelope text-white text-base sm:text-lg"></i>
               </div>
               <div>
-                <h3 className="font-bold text-white text-lg">Suscríbete a nuestra newsletter</h3>
-                <p className="text-white/80 text-sm">No te pierdas ofertas y novedades</p>
+                <h3 className="font-bold text-white text-sm sm:text-lg">Suscríbete a nuestra newsletter</h3>
+                <p className="text-white/80 text-xs sm:text-sm">No te pierdas ofertas y novedades</p>
               </div>
             </div>
             <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row w-full lg:w-auto max-w-md gap-2">
@@ -118,31 +123,120 @@ export default function Footer() {
                 type="email"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setNewsletterStatus('idle') }}
-                placeholder="Introduce tu email"
+                placeholder="Tu email"
                 disabled={newsletterStatus === 'loading'}
-                className="flex-1 px-5 py-3 border border-white/30 rounded-lg sm:rounded-l-lg sm:rounded-r-none focus:outline-none focus:ring-2 focus:ring-white/50 bg-white/10 text-white placeholder-white/60 disabled:opacity-70"
+                className="flex-1 px-4 sm:px-5 py-2.5 sm:py-3 border border-white/30 rounded-lg sm:rounded-l-lg sm:rounded-r-none focus:outline-none focus:ring-2 focus:ring-white/50 bg-white/10 text-white placeholder-white/60 disabled:opacity-70 text-sm"
               />
               <button
                 type="submit"
                 disabled={newsletterStatus === 'loading'}
-                className="px-6 py-3 bg-secondary hover:bg-white hover:text-primary text-white font-semibold rounded-lg sm:rounded-r-lg sm:rounded-l-none transition-colors disabled:opacity-70 flex-shrink-0"
+                className="px-5 sm:px-6 py-2.5 sm:py-3 bg-secondary hover:bg-white hover:text-primary text-white font-semibold rounded-lg sm:rounded-r-lg sm:rounded-l-none transition-colors disabled:opacity-70 flex-shrink-0 text-sm active:scale-95"
               >
-                {newsletterStatus === 'loading' ? 'Enviando...' : 'Suscribirse'}
+                {newsletterStatus === 'loading' ? '...' : 'Suscribirse'}
               </button>
-              {newsletterStatus === 'success' && (
-                <p className="text-green-300 text-sm w-full sm:col-span-2">¡Gracias por suscribirte!</p>
-              )}
-              {newsletterStatus === 'error' && (
-                <p className="text-red-200 text-sm w-full sm:col-span-2">Error. Inténtalo de nuevo.</p>
-              )}
             </form>
+            {newsletterStatus === 'success' && (
+              <p className="text-green-300 text-xs sm:text-sm w-full text-center lg:hidden">¡Gracias por suscribirte!</p>
+            )}
+            {newsletterStatus === 'error' && (
+              <p className="text-red-200 text-xs sm:text-sm w-full text-center lg:hidden">Error. Inténtalo de nuevo.</p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 2. 4 columnas */}
-      <div className="container mx-auto px-4 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+      {/* 2. Contenido principal */}
+      <div className="container mx-auto px-3 sm:px-4 py-8 sm:py-14">
+        
+        {/* MÓVIL: Acordeones colapsables */}
+        <div className="sm:hidden space-y-0">
+          {/* Logo y contacto rápido */}
+          <div className="pb-5 mb-4 border-b border-white/10">
+            <Link href="/" className="inline-block mb-4">
+              <img src="/logo-white.webp" alt={STORE.name} className="h-8 w-auto" />
+            </Link>
+            <div className="flex gap-3">
+              <a
+                href={`https://wa.me/${STORE.whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 bg-[#25D366] text-white py-2.5 rounded-lg text-sm font-medium active:scale-95 transition"
+              >
+                <i className="fab fa-whatsapp"></i>
+                WhatsApp
+              </a>
+              <a
+                href={`mailto:${STORE.email}`}
+                className="flex-1 flex items-center justify-center gap-2 bg-white/10 text-white py-2.5 rounded-lg text-sm font-medium active:scale-95 transition"
+              >
+                <i className="fas fa-envelope"></i>
+                Email
+              </a>
+            </div>
+          </div>
+
+          {/* Acordeón: Información */}
+          <div className="border-b border-white/10">
+            <button
+              onClick={() => toggleSection('info')}
+              className="w-full flex items-center justify-between py-3 text-white font-semibold text-sm"
+            >
+              Información
+              <i className={`fas fa-chevron-down text-xs transition-transform ${openSection === 'info' ? 'rotate-180' : ''}`}></i>
+            </button>
+            <div className={`overflow-hidden transition-all duration-300 ${openSection === 'info' ? 'max-h-60 pb-3' : 'max-h-0'}`}>
+              <ul className="space-y-2">
+                {infoLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-white/70 text-sm block py-1">{link.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Acordeón: Tu cuenta */}
+          <div className="border-b border-white/10">
+            <button
+              onClick={() => toggleSection('account')}
+              className="w-full flex items-center justify-between py-3 text-white font-semibold text-sm"
+            >
+              Tu cuenta
+              <i className={`fas fa-chevron-down text-xs transition-transform ${openSection === 'account' ? 'rotate-180' : ''}`}></i>
+            </button>
+            <div className={`overflow-hidden transition-all duration-300 ${openSection === 'account' ? 'max-h-48 pb-3' : 'max-h-0'}`}>
+              <ul className="space-y-2">
+                {accountLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-white/70 text-sm block py-1">{link.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Redes sociales móvil */}
+          <div className="pt-5">
+            <p className="text-white/60 text-xs mb-3 text-center">Síguenos</p>
+            <div className="flex justify-center gap-3">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.icon}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/80 active:scale-95 transition"
+                  aria-label={social.label}
+                >
+                  <i className={`${social.icon} text-sm`}></i>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* TABLET Y DESKTOP: Grid de 4 columnas */}
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
           {/* Columna 1 - Store Information */}
           <div>
             <Link href="/" className="inline-block mb-5">
@@ -292,13 +386,14 @@ export default function Footer() {
       </div>
 
       {/* 3. Copyright y redes */}
-      <div className="border-t border-white/20 py-6">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-white/70 text-sm text-center md:text-left">
-              © {new Date().getFullYear()} {STORE.name}. Todos los derechos reservados.
+      <div className="border-t border-white/20 py-4 sm:py-6">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+            <p className="text-white/60 text-xs sm:text-sm text-center sm:text-left order-2 sm:order-1">
+              © {new Date().getFullYear()} {STORE.name}
             </p>
-            <div className="flex gap-3">
+            {/* Redes desktop */}
+            <div className="hidden sm:flex gap-3 order-1 sm:order-2">
               {socialLinks.map((social) => (
                 <a
                   key={social.icon}

@@ -17,9 +17,9 @@ export default function PromoBanners() {
               <h3 className="text-4xl font-bold mb-2">
                 Grandes ahorros <span className="block text-2xl">en pesca</span>
               </h3>
-              <button className="bg-primary text-white px-8 py-2.5 rounded-full font-semibold hover:bg-secondary transition text-sm uppercase mt-4">
+              <a href="/tienda" className="inline-block bg-primary text-white px-8 py-2.5 rounded-full font-semibold hover:bg-secondary transition text-sm uppercase mt-4">
                 Ver ofertas
-              </button>
+              </a>
             </div>
           </div>
 
@@ -40,9 +40,9 @@ export default function PromoBanners() {
               <p className="text-xl mb-5 font-light">
                 spinning extremo
               </p>
-              <button className="bg-primary text-white px-8 py-2.5 rounded-full font-semibold hover:bg-secondary transition text-sm uppercase">
+              <a href="/tienda" className="inline-block bg-primary text-white px-8 py-2.5 rounded-full font-semibold hover:bg-secondary transition text-sm uppercase">
                 Comprar
-              </button>
+              </a>
             </div>
           </div>
         </div>
