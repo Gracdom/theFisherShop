@@ -239,45 +239,49 @@ function TiendaContent() {
     : sortedProducts
 
   return (
-    <div className="bg-[#fafbfc] min-h-screen">
-      {/* ===================== MÓVIL: Diseño App-like ===================== */}
-      <div className="lg:hidden">
-        {/* Sticky Header App-style */}
-        <div className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
-          {/* Search Bar */}
-          <div className="px-3 py-3">
+    <div className="bg-white min-h-screen lg:bg-[#fafbfc]">
+      {/* ===================== MÓVIL: Diseño App nativo ===================== */}
+      <div className="lg:hidden pb-24">
+        {/* Header fijo estilo app - todo junto para que sticky funcione */}
+        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-100 safe-area-top shadow-sm">
+          {/* Search Bar - iOS/Material style */}
+          <div className="px-3 pt-3 pb-2">
             <div className="relative">
               <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar productos..."
-                className="w-full pl-11 pr-4 py-3 bg-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-white transition"
+                placeholder="Buscar en The Fisher Shop"
+                className="w-full pl-11 pr-10 py-3.5 bg-gray-100 rounded-2xl text-[15px] focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-gray-50 transition placeholder:text-gray-400"
               />
-              {searchQuery && (
+              {searchQuery ? (
                 <button 
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-gray-300/80 flex items-center justify-center text-gray-600 active:scale-95"
                 >
-                  <i className="fas fa-times text-sm"></i>
+                  <i className="fas fa-times text-xs"></i>
                 </button>
+              ) : (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <i className="fas fa-microphone text-gray-400 text-sm"></i>
+                </div>
               )}
             </div>
           </div>
 
-          {/* Categories Horizontal Scroll */}
+          {/* Categories - snap scroll como app */}
           <div 
             ref={categoryScrollRef}
-            className="flex gap-2 overflow-x-auto px-3 pb-3 scrollbar-hide"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="flex gap-2 overflow-x-auto px-3 pb-3 scrollbar-hide snap-x snap-mandatory"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
           >
             <button
               onClick={() => handleCategoryClick(null)}
-              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`flex-shrink-0 px-4 py-2.5 rounded-full text-sm font-semibold transition-all snap-start active:scale-95 ${
                 !categorySlug 
-                  ? 'bg-primary text-white shadow-md' 
-                  : 'bg-gray-100 text-gray-600 active:bg-gray-200'
+                  ? 'bg-primary text-white shadow-lg shadow-primary/25' 
+                  : 'bg-gray-100 text-gray-600'
               }`}
             >
               Todos
@@ -286,115 +290,126 @@ function TiendaContent() {
               <button
                 key={c.id}
                 onClick={() => handleCategoryClick(c.slug)}
-                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                className={`flex-shrink-0 px-4 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap snap-start active:scale-95 ${
                   categorySlug === c.slug 
-                    ? 'bg-primary text-white shadow-md' 
-                    : 'bg-gray-100 text-gray-600 active:bg-gray-200'
+                    ? 'bg-primary text-white shadow-lg shadow-primary/25' 
+                    : 'bg-gray-100 text-gray-600'
                 }`}
               >
                 {c.name}
               </button>
             ))}
           </div>
-        </div>
 
-        {/* Results Count & Sort/Filter Buttons */}
-        <div className="sticky top-[118px] z-30 bg-[#fafbfc] px-3 py-2 flex items-center justify-between border-b border-gray-100">
+          {/* Toolbar - Ordenar y Filtrar (dentro del mismo sticky) */}
+          <div className="px-3 py-2.5 flex items-center justify-between border-t border-gray-100">
           <span className="text-sm text-gray-500">
-            <span className="font-semibold text-gray-900">{filteredBySearch.length}</span> productos
+            <span className="font-bold text-gray-900">{filteredBySearch.length}</span> productos
           </span>
           <div className="flex gap-2">
             <button
               onClick={() => setShowMobileSort(true)}
-              className="flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-gray-200 text-sm font-medium text-gray-700 active:bg-gray-50"
+              className="flex items-center gap-2 px-3.5 py-2.5 bg-gray-50 rounded-xl text-sm font-medium text-gray-700 active:scale-[0.98]"
             >
-              <i className="fas fa-sort-amount-down text-xs text-gray-400"></i>
+              <i className="fas fa-sort-amount-down-alt text-primary text-xs"></i>
               Ordenar
             </button>
             <button
               onClick={() => setShowMobileFilters(true)}
-              className="relative flex items-center gap-1.5 px-3 py-2 bg-white rounded-lg border border-gray-200 text-sm font-medium text-gray-700 active:bg-gray-50"
+              className="relative flex items-center gap-2 px-3.5 py-2.5 bg-gray-50 rounded-xl text-sm font-medium text-gray-700 active:scale-[0.98]"
             >
-              <i className="fas fa-sliders-h text-xs text-gray-400"></i>
+              <i className="fas fa-sliders-h text-primary text-xs"></i>
               Filtrar
               {activeFiltersCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                   {activeFiltersCount}
                 </span>
               )}
             </button>
           </div>
         </div>
+        </div>
 
-        {/* Product Grid Mobile */}
-        <div className="px-3 py-4">
+        {/* Product Grid - estilo app e-commerce */}
+        <div className="px-2 py-3">
           {loading ? (
-            <div className="grid grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-2 gap-2">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-56 rounded-xl bg-gray-100 animate-pulse" />
+                <div key={i} className="bg-gray-50 rounded-2xl overflow-hidden">
+                  <div className="aspect-square bg-gray-200 animate-pulse" />
+                  <div className="p-3 space-y-2">
+                    <div className="h-3 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-3 bg-gray-200 rounded w-2/3 animate-pulse" />
+                    <div className="h-5 bg-gray-200 rounded w-1/3 animate-pulse" />
+                  </div>
+                </div>
               ))}
             </div>
           ) : filteredBySearch.length === 0 ? (
-            <div className="text-center py-16 px-4">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 flex items-center justify-center">
-                <i className="fas fa-search text-2xl text-gray-300"></i>
+            <div className="flex flex-col items-center justify-center py-20 px-6">
+              <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                <i className="fas fa-search text-3xl text-gray-300"></i>
               </div>
-              <p className="text-gray-600 font-medium mb-1">No hay resultados</p>
-              <p className="text-gray-400 text-sm">Prueba con otro término o categoría</p>
+              <h3 className="text-lg font-bold text-gray-900 mb-1">Sin resultados</h3>
+              <p className="text-gray-500 text-sm text-center mb-6">Prueba con otro término o cambia de categoría</p>
               <button 
                 onClick={() => { setSearchQuery(''); router.push('/tienda') }}
-                className="mt-4 text-primary font-semibold text-sm"
+                className="px-6 py-3 bg-primary text-white font-semibold rounded-xl active:scale-95"
               >
-                Ver todos los productos
+                Ver todos
               </button>
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-2 gap-2">
                 {filteredBySearch.slice(0, currentPage * 12).map((p) => (
                   <ProductCard key={p.id} product={p} variant="grid" />
                 ))}
               </div>
               
-              {/* Load More Button */}
               {currentPage * 12 < filteredBySearch.length && (
                 <button
                   onClick={() => setCurrentPage(p => p + 1)}
-                  className="w-full mt-6 py-3.5 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 active:bg-gray-50 transition flex items-center justify-center gap-2"
+                  className="w-full mt-4 py-4 bg-gray-50 rounded-2xl text-sm font-semibold text-gray-700 active:scale-[0.99] transition"
                 >
-                  <span>Cargar más productos</span>
-                  <span className="text-gray-400">({filteredBySearch.length - currentPage * 12} restantes)</span>
+                  Ver más ({filteredBySearch.length - currentPage * 12})
                 </button>
               )}
             </>
           )}
         </div>
 
-        {/* Bottom Sheet: Sort */}
+        {/* Bottom Sheet: Ordenar */}
         {showMobileSort && (
           <div className="fixed inset-0 z-50">
-            <div className="absolute inset-0 bg-black/50" onClick={() => setShowMobileSort(false)} />
-            <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-4 pb-8 animate-slide-up">
-              <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
+            <div 
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
+              onClick={() => setShowMobileSort(false)} 
+            />
+            <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-4 pb-8 shadow-2xl safe-area-bottom" style={{ animation: 'slideUp 0.3s ease-out' }}>
+              <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
               <h3 className="text-lg font-bold text-gray-900 mb-4">Ordenar por</h3>
               <div className="space-y-1">
                 {[
-                  { value: 'default', label: 'Más relevantes' },
-                  { value: 'price-asc', label: 'Precio: menor a mayor' },
-                  { value: 'price-desc', label: 'Precio: mayor a menor' },
-                  { value: 'name', label: 'Nombre: A-Z' },
+                  { value: 'default', label: 'Más relevantes', icon: 'fa-fire' },
+                  { value: 'price-asc', label: 'Menor precio', icon: 'fa-arrow-up' },
+                  { value: 'price-desc', label: 'Mayor precio', icon: 'fa-arrow-down' },
+                  { value: 'name', label: 'Nombre A-Z', icon: 'fa-sort-alpha-down' },
                 ].map((opt) => (
                   <button
                     key={opt.value}
                     onClick={() => { setSortBy(opt.value); setShowMobileSort(false) }}
-                    className={`w-full text-left px-4 py-3.5 rounded-xl text-sm font-medium transition ${
+                    className={`w-full flex items-center justify-between px-4 py-4 rounded-2xl text-[15px] font-medium transition active:scale-[0.99] ${
                       sortBy === opt.value 
                         ? 'bg-primary/10 text-primary' 
-                        : 'text-gray-700 active:bg-gray-100'
+                        : 'text-gray-700 bg-gray-50'
                     }`}
                   >
-                    {opt.label}
-                    {sortBy === opt.value && <i className="fas fa-check float-right text-primary"></i>}
+                    <span className="flex items-center gap-3">
+                      <i className={`fas ${opt.icon} text-sm ${sortBy === opt.value ? 'text-primary' : 'text-gray-400'}`}></i>
+                      {opt.label}
+                    </span>
+                    {sortBy === opt.value && <i className="fas fa-check text-primary"></i>}
                   </button>
                 ))}
               </div>
@@ -402,21 +417,21 @@ function TiendaContent() {
           </div>
         )}
 
-        {/* Bottom Sheet: Filters */}
+        {/* Bottom Sheet: Filtros */}
         {showMobileFilters && (
           <div className="fixed inset-0 z-50">
-            <div className="absolute inset-0 bg-black/50" onClick={() => setShowMobileFilters(false)} />
-            <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[85vh] overflow-hidden flex flex-col animate-slide-up">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowMobileFilters(false)} />
+            <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl safe-area-bottom" style={{ animation: 'slideUp 0.3s ease-out' }}>
               <div className="p-4 border-b border-gray-100 flex-shrink-0">
-                <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3" />
+                <div className="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-4" />
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-bold text-gray-900">Filtros</h3>
                   {activeFiltersCount > 0 && (
                     <button 
                       onClick={() => { setFilterPrice({}); setFilterColor({}) }}
-                      className="text-sm text-primary font-medium"
+                      className="text-sm text-primary font-semibold active:scale-95"
                     >
-                      Limpiar todo
+                      Limpiar
                     </button>
                   )}
                 </div>
@@ -483,10 +498,10 @@ function TiendaContent() {
               </div>
 
               {/* Apply Button */}
-              <div className="p-4 border-t border-gray-100 flex-shrink-0">
+              <div className="p-4 border-t border-gray-100 flex-shrink-0 bg-white">
                 <button
                   onClick={() => setShowMobileFilters(false)}
-                  className="w-full py-4 bg-primary text-white font-bold rounded-xl active:bg-secondary transition"
+                  className="w-full py-4 bg-primary text-white font-bold rounded-2xl active:scale-[0.99] shadow-lg shadow-primary/25"
                 >
                   Ver {filteredBySearch.length} productos
                 </button>
@@ -655,7 +670,7 @@ function TiendaContent() {
 
                 {/* Promo Banner */}
                 <Link href="/tienda" className="block relative overflow-hidden rounded-3xl group">
-                  <div className="h-56 bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style={{ backgroundImage: 'url("/images/tienda%20(2).webp")' }} />
+                  <div className="h-56 bg-cover bg-center bg-primary/20 transition-transform duration-500 group-hover:scale-105" style={{ backgroundImage: 'url("/images/tienda%20(2).webp"), url("/images/home%20(2).webp"), linear-gradient(135deg, rgb(0,61,91) 0%, rgb(0,90,130) 100%)' }} />
                   <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/50 to-transparent flex flex-col justify-end p-6">
                     <span className="text-white/80 text-xs font-medium uppercase tracking-widest">Oferta</span>
                     <h4 className="text-xl font-bold text-white mt-1">Hasta 15% de ahorro</h4>

@@ -69,13 +69,17 @@ export async function POST(request: NextRequest) {
 
     // Generar número de pedido único
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const emailEnc = encodeURIComponent(customerInfo.email)
+    const phoneEnc = encodeURIComponent((customerInfo.phone || '').trim())
+    const successUrl = `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&transaction_id=${orderNumber}&value=${total.toFixed(2)}&currency=EUR&email=${emailEnc}&phone=${phoneEnc}`
 
     // Crear sesión de Stripe Checkout
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: successUrl,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/checkout`,
       customer_email: customerInfo.email,
       metadata: {

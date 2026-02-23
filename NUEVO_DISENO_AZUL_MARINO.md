@@ -94,7 +94,7 @@ Todos los textos han sido actualizados:
 - Título: "Finalizar Compra"
 - Formulario en español
 - Subtotal, Envío: GRATIS, Total en €
-- Botón: "Pagar con Stripe"
+- Botón: "Pagar"
 
 #### **Página de Éxito:**
 - "¡Pago Completado!"

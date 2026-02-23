@@ -17,13 +17,6 @@ const slides = [
     buttonLink: "/tienda",
     features: ["+500 Productos", "Expertos en Pesca", "Soporte 24/7"],
   },
-  {
-    title: "Todo para Tu Próxima Captura",
-    subtitle: "Las mejores marcas y equipamiento de pesca. Envío rápido y asesoramiento experto.",
-    buttonText: "Ver Tienda",
-    buttonLink: "/tienda",
-    features: ["Marcas Top", "Ofertas Exclusivas", "Envío 24-48h"],
-  },
 ]
 
 export default function Hero() {
@@ -41,7 +34,7 @@ export default function Hero() {
     setCurrentSlide(index)
   }
 
-  const bannerImages = ['/images/banner.webp', '/images/banner2.webp', '/images/banner.webp']
+  const bannerImages = ['/images/banner.webp', '/images/banner2.webp']
 
   const stars = Array.from({ length: 12 }, (_, i) => ({
     id: i,

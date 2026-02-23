@@ -250,20 +250,20 @@ export default function Footer() {
               Información de la tienda
             </h5>
             <ul className="space-y-4 text-white/80 text-sm">
-              <li className="flex gap-3">
-                <i className="fab fa-whatsapp text-secondary mt-0.5 flex-shrink-0 text-lg"></i>
+              <li>
                 <a
                   href={`https://wa.me/${STORE.whatsapp}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white transition"
+                  className="flex gap-3 items-center hover:text-white transition"
                 >
+                  <i className="fab fa-whatsapp text-secondary flex-shrink-0 text-lg"></i>
                   {STORE.whatsappDisplay}
                 </a>
               </li>
-              <li className="flex gap-3">
-                <i className="fas fa-envelope text-secondary mt-0.5 flex-shrink-0"></i>
-                <a href={`mailto:${STORE.email}`} className="hover:text-white transition">
+              <li>
+                <a href={`mailto:${STORE.email}`} className="flex gap-3 items-center hover:text-white transition">
+                  <i className="fas fa-envelope text-secondary flex-shrink-0"></i>
                   {STORE.email}
                 </a>
               </li>

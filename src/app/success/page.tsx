@@ -1,15 +1,20 @@
 'use client'
 
-import { Suspense, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useEffect, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useCart } from '@/context/CartContext'
 import Link from 'next/link'
 
 function SuccessContent() {
   const { clearCart } = useCart()
-  const router = useRouter()
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('session_id')
+  const transactionId = searchParams.get('transaction_id')
+  const value = searchParams.get('value')
+  const currency = searchParams.get('currency') || 'EUR'
+  const email = searchParams.get('email')
+  const phone = searchParams.get('phone')
+  const gtmPushed = useRef(false)
 
   useEffect(() => {
     if (sessionId) {
@@ -22,6 +27,30 @@ function SuccessContent() {
       }).catch(() => {})
     }
   }, [sessionId, clearCart])
+
+  // GTM: evento purchase usando parámetros de la URL
+  useEffect(() => {
+    if (gtmPushed.current) return
+    const tid = transactionId || `BC-${Date.now()}`
+    const val = value ? parseFloat(value) : 0
+    gtmPushed.current = true
+    const w = typeof window !== 'undefined' ? window : null
+    if (w) {
+      ;(w as any).dataLayer = (w as any).dataLayer || []
+      ;(w as any).dataLayer.push({
+        event: 'purchase',
+        ecommerce: {
+          transaction_id: tid,
+          value: val,
+          currency: currency || 'EUR',
+        },
+        user_data: {
+          email: email || '',
+          phone: phone || '',
+        },
+      })
+    }
+  }, [transactionId, value, currency, email, phone])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center px-4 py-12">
@@ -94,11 +123,30 @@ function SuccessContent() {
           </Link>
         </div>
 
-        {/* Session ID (for development) */}
-        {sessionId && (
-          <p className="mt-8 text-xs text-gray-400">
-            ID de sesión: {sessionId}
-          </p>
+        {/* Detalles de la transacción (visibles en DOM para GTM/analytics) */}
+        {(sessionId || transactionId) && (
+          <div className="mt-8 pt-6 border-t border-gray-100 text-left">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+              Resumen de la transacción
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600">
+              {transactionId && (
+                <p><span className="text-gray-400">ID:</span> {transactionId}</p>
+              )}
+              {value && (
+                <p><span className="text-gray-400">Valor:</span> {value} {currency}</p>
+              )}
+              {email && (
+                <p><span className="text-gray-400">Correo:</span> {email}</p>
+              )}
+              {phone && (
+                <p><span className="text-gray-400">Teléfono:</span> {phone}</p>
+              )}
+              {sessionId && (
+                <p className="sm:col-span-2"><span className="text-gray-400">ID sesión:</span> {sessionId}</p>
+              )}
+            </div>
+          </div>
         )}
       </div>
     </div>

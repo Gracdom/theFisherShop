@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { resend, canSendEmail, fromEmail } from '@/lib/resend'
+import { contactReceivedEmail } from '@/lib/emails/contact-received'
 
 const STORE_EMAIL = 'info@thefishershop.com'
 
@@ -35,15 +36,12 @@ export async function POST(request: NextRequest) {
       ? `[Contacto] ${String(subject).trim()}`
       : `[Contacto] Mensaje de ${String(name).trim()}`
 
-    const html = `
-      <h2>Nuevo mensaje de contacto</h2>
-      <p><strong>Nombre:</strong> ${escapeHtml(String(name))}</p>
-      <p><strong>Email:</strong> ${escapeHtml(emailStr)}</p>
-      ${subject ? `<p><strong>Asunto:</strong> ${escapeHtml(String(subject))}</p>` : ''}
-      <hr />
-      <p><strong>Mensaje:</strong></p>
-      <p>${escapeHtml(String(message)).replace(/\n/g, '<br />')}</p>
-    `
+    const html = contactReceivedEmail({
+      name: String(name).trim(),
+      email: emailStr,
+      subject: subject ? String(subject).trim() : undefined,
+      message: String(message).trim(),
+    })
 
     const { data, error } = await resend!.emails.send({
       from: fromEmail,
@@ -71,10 +69,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-}

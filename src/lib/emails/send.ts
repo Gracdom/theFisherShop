@@ -2,8 +2,25 @@ import { resend, canSendEmail, fromEmail } from '@/lib/resend'
 import { orderConfirmationEmail, type OrderConfirmationData } from './order-confirmation'
 import { adminSaleNotificationEmail } from './admin-sale-notification'
 import { abandonedCartEmail, type AbandonedCartData } from './abandoned-cart'
+import { newsletterWelcomeEmail } from './newsletter-welcome'
 
 const ADMIN_EMAIL = 'karen.rivera@gracdom.com'
+
+export async function sendNewsletterWelcome(to: string): Promise<boolean> {
+  if (!canSendEmail() || !resend) return false
+  const html = newsletterWelcomeEmail()
+  const { error } = await resend.emails.send({
+    from: fromEmail,
+    to: [to],
+    subject: '¡Bienvenido a la newsletter! | The Fisher Shop',
+    html,
+  })
+  if (error) {
+    console.error('sendNewsletterWelcome error:', error)
+    return false
+  }
+  return true
+}
 
 export async function sendOrderConfirmation(to: string, data: OrderConfirmationData): Promise<boolean> {
   if (!canSendEmail() || !resend) return false

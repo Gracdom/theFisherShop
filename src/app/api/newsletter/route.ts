@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
+import { sendNewsletterWelcome } from '@/lib/emails/send'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,6 +44,14 @@ export async function POST(request: NextRequest) {
         source: subscribeSource,
       },
     })
+
+    // Enviar correo de bienvenida al nuevo suscriptor
+    try {
+      await sendNewsletterWelcome(normalizedEmail)
+    } catch (e) {
+      console.error('Error enviando email de bienvenida newsletter:', e)
+      // No fallar la suscripción si el correo falla
+    }
 
     return NextResponse.json({
       message: '¡Gracias por suscribirte!',
