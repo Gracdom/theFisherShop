@@ -27,14 +27,12 @@ export async function callCreateCheckoutSession(body: { items: unknown[]; custom
   const data = await res.json()
 
   if (!res.ok) {
-    // Aseguramos que siempre devolvemos un string legible en el mensaje de error
-    const message =
-      (data && (data.error || data.message)) ||
-      `Error en create-checkout-session (${res.status})`
-    // Si el error es un objeto complejo lo serializamos
-    const normalizedMessage =
-      typeof message === 'string' ? message : JSON.stringify(message)
-    throw new Error(normalizedMessage)
+    // Aseguramos que siempre devolvemos texto comprensible
+    console.error('Error create-checkout-session:', data)
+    const serialized = JSON.stringify(
+      data && (data.error || data.message || data) || { status: res.status },
+    )
+    throw new Error(serialized)
   }
 
   return data
