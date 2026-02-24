@@ -24,7 +24,20 @@ export async function callCreateCheckoutSession(body: { items: unknown[]; custom
     headers: getHeaders(),
     body: JSON.stringify(body),
   })
-  return res.json()
+  const data = await res.json()
+
+  if (!res.ok) {
+    // Aseguramos que siempre devolvemos un string legible en el mensaje de error
+    const message =
+      (data && (data.error || data.message)) ||
+      `Error en create-checkout-session (${res.status})`
+    // Si el error es un objeto complejo lo serializamos
+    const normalizedMessage =
+      typeof message === 'string' ? message : JSON.stringify(message)
+    throw new Error(normalizedMessage)
+  }
+
+  return data
 }
 
 export async function callContact(body: { name: string; email: string; subject?: string; message: string }) {
