@@ -96,9 +96,12 @@ serve(async (req) => {
       shipping_address_collection: { allowed_countries: ['ES', 'PT', 'FR', 'IT', 'US', 'GB'] },
     })
 
+    const orderId = crypto.randomUUID()
+
     const { data: order, error: orderErr } = await supabase
       .from('Order')
       .insert({
+        id: orderId,
         orderNumber,
         customerId: customer!.id,
         total,
@@ -114,7 +117,7 @@ serve(async (req) => {
     if (orderErr) throw orderErr
 
     const orderItems = items.map((item: { id: string; quantity: number; price: number }) => ({
-      orderId: order.id,
+      orderId: orderId,
       productId: item.id,
       quantity: item.quantity,
       price: item.price,
@@ -125,9 +128,15 @@ serve(async (req) => {
     return new Response(JSON.stringify({ sessionId: session.id, orderNumber }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err)
-    return new Response(JSON.stringify({ error: msg }), {
+  } catch (err: any) {
+    const errorMsg = err?.message || JSON.stringify(err, null, 2)
+
+    console.error('Error REAL procesando checkout:', errorMsg)
+    if (typeof err === 'object') {
+      console.error('Detalles crudos del error:', err)
+    }
+
+    return new Response(JSON.stringify({ error: errorMsg }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
