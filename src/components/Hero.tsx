@@ -15,7 +15,7 @@ const slides = [
     subtitle: "Desde cañas hasta carretes, pasando por señuelos y accesorios. Todo para hacer de tu pesca una experiencia única.",
     buttonText: "Ver Productos",
     buttonLink: "/tienda",
-    features: ["+500 Productos", "Expertos en Pesca", "Soporte 24/7"],
+    features: ["+500 Productos", "Expertos en Pesca", "Soporte en horario laboral"],
   },
 ]
 

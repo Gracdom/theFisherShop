@@ -46,13 +46,11 @@ export default function InformacionEnvioPage() {
             <section>
               <h2 className="text-xl font-bold text-gray-900 mb-3">Plazos de preparación y entrega</h2>
               <p className="mb-4">
-                Preparamos y enviamos tu pedido en <strong>24-48 horas laborables</strong> tras la confirmación del pago. Los plazos de entrega indicados son orientativos y dependen del transportista y la zona:
+                El plazo de entrega estimado es de <strong>3 a 7 días laborables</strong> desde la confirmación del pago. Los plazos son orientativos y dependen del transportista y la zona de destino.
               </p>
               <ul className="list-disc pl-6 space-y-2">
-                <li><strong>Península:</strong> 2-5 días laborables</li>
-                <li><strong>Baleares, Ceuta y Melilla:</strong> 3-7 días laborables</li>
-                <li><strong>Canarias:</strong> 5-10 días laborables</li>
-                <li><strong>Envío express:</strong> 24-48h en península (según disponibilidad)</li>
+                <li><strong>Península, Baleares, Ceuta y Melilla:</strong> 3 a 7 días laborables</li>
+                <li><strong>Canarias:</strong> 5 a 7 días laborables</li>
               </ul>
               <p className="mt-4 text-gray-500 text-sm">
                 No realizamos envíos los fines de semana ni festivos. Los días no laborables no se computan en el plazo.

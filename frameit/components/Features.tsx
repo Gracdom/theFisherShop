@@ -16,7 +16,7 @@ const features = [
   {
     icon: Headphones,
     title: "Atención al cliente",
-    description: "Nuestro equipo está disponible para ayudarte en cada paso del proceso. Soporte 24/7.",
+    description: "Nuestro equipo está disponible para ayudarte en horario laboral de España.",
     color: "text-orange-600",
   },
   {

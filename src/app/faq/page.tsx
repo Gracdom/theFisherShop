@@ -9,7 +9,7 @@ const faqCategories = [
     faqs: [
       {
         q: '¿Cuál es el plazo de entrega?',
-        a: 'Los pedidos se preparan y envían en 24-48 horas laborables. La entrega suele tardar 2-5 días laborables en la península y 3-7 días en Canarias, Baleares y Ceuta.',
+        a: 'El plazo de entrega es de 3 a 7 días laborables desde la confirmación del pago, según la zona de destino.',
       },
       {
         q: '¿Los envíos son gratuitos?',

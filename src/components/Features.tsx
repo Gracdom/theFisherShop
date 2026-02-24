@@ -13,9 +13,9 @@ const features = [
   },
   {
     icon: 'fa-headset',
-    title: 'Soporte 24h',
-    titleLong: 'Atención 24 horas',
-    description: 'Soporte disponible todo el día',
+    title: 'Soporte',
+    titleLong: 'Atención en horario laboral',
+    description: 'Atención al cliente en horario laboral de España',
   },
 ]
 
