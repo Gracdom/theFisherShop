@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react'
 
 export interface CartItem {
   id: string
@@ -10,6 +10,7 @@ export interface CartItem {
   image?: string
 }
 
+const STORAGE_CART_KEY = 'fisher_cart'
 export const STORAGE_EMAIL_KEY = 'fisher_checkout_email'
 
 interface CartContextType {
@@ -29,6 +30,31 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([])
   const [showEmailPopup, setShowEmailPopup] = useState(false)
+
+  // Cargar carrito desde localStorage al iniciar (solo cliente)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const raw = localStorage.getItem(STORAGE_CART_KEY)
+      if (!raw) return
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) {
+        setCart(parsed)
+      }
+    } catch {
+      // ignorar errores de parseo
+    }
+  }, [])
+
+  // Guardar carrito en localStorage cada vez que cambie
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      localStorage.setItem(STORAGE_CART_KEY, JSON.stringify(cart))
+    } catch {
+      // ignorar errores de almacenamiento
+    }
+  }, [cart])
 
   const addToCart = useCallback((item: Omit<CartItem, 'quantity'>) => {
     setCart((prevCart) => {

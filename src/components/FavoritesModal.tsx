@@ -16,8 +16,8 @@ export default function FavoritesModal() {
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closeFavorites} />
-      <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl flex flex-col" style={{ animation: 'slideInRight 0.3s ease-out' }}>
+      <div className="absolute inset-0 bg-black/50" onClick={closeFavorites} />
+      <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl flex flex-col" style={{ animation: 'slideInRight 0.25s ease-out', willChange: 'transform' }}>
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-6 border-b bg-primary">
             <div className="flex items-center gap-3">

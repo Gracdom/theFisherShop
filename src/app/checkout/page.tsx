@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useCart, STORAGE_EMAIL_KEY } from '@/context/CartContext'
 import { useRouter } from 'next/navigation'
 import { loadStripe } from '@stripe/stripe-js'
-import { callAbandonedCart } from '@/lib/supabase-functions'
+import { callAbandonedCart, callCreateCheckoutSession } from '@/lib/supabase-functions'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
@@ -62,17 +62,10 @@ export default function CheckoutPage() {
     setLoading(true)
 
     try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: cart, customerInfo }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Error al crear la sesión de pago')
+      const data = await callCreateCheckoutSession({ items: cart, customerInfo: customerInfo as any })
       const sessionId = data.sessionId
       if (!sessionId) throw new Error(data.error || 'Error al crear la sesión de pago')
 
-      // Redirigir a Stripe Checkout
       const stripe = await stripePromise
       const { error } = await stripe!.redirectToCheckout({ sessionId })
 
