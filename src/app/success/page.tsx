@@ -144,21 +144,14 @@ function SuccessContent() {
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        {/* Action Button */}
+        <div className="flex justify-center">
           <Link
             href="/"
             className="bg-primary text-white px-8 py-4 rounded-full font-bold hover:bg-secondary transition transform hover:scale-105 text-sm uppercase"
           >
             <i className="fas fa-home mr-2"></i>
             Volver a la tienda
-          </Link>
-          <Link
-            href="/pedidos"
-            className="border-2 border-gray-400 text-gray-700 px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition text-sm uppercase"
-          >
-            <i className="fas fa-list mr-2"></i>
-            Mis pedidos
           </Link>
         </div>
 

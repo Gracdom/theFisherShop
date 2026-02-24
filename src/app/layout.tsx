@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import EntryPopup from '@/components/EntryPopup'
 import CartEmailPopup from '@/components/CartEmailPopup'
 import FloatingButtons from '@/components/FloatingButtons'
 import { CartProvider } from '@/context/CartContext'
@@ -58,7 +57,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             {children}
           </main>
           <Footer />
-          <EntryPopup />
           <CartEmailPopup />
           <FloatingButtons />
           <FavoritesModal />
