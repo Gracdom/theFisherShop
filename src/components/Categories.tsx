@@ -229,7 +229,7 @@ export default function Categories() {
                         <Link
                           key={s.id}
                           href={`/tienda?categoria=${category.slug}&subcategoria=${s.slug}`}
-                          className="text-sm text-gray-600 hover:text-primary font-medium transition"
+                          className="text-xs text-gray-600 hover:text-primary font-medium transition"
                         >
                           {s.name}
                         </Link>

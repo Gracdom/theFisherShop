@@ -17,12 +17,6 @@ const features = [
     titleLong: 'Atención 24 horas',
     description: 'Soporte disponible todo el día',
   },
-  {
-    icon: 'fa-mobile-alt',
-    title: 'App móvil',
-    titleLong: 'Compra desde la app',
-    description: 'Descarga la app y consigue ofertas',
-  },
 ]
 
 export default function Features() {
@@ -47,7 +41,7 @@ export default function Features() {
         </div>
 
         {/* Tablet y Desktop */}
-        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
           {features.map((feature, index) => (
             <div
               key={index}

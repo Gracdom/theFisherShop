@@ -1,0 +1,18 @@
+# Supabase local config - The Fisher Shop
+# https://supabase.com/docs/guides/cli/config
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+shadow_port = 54320
+
+[studio]
+enabled = true
+port = 54323
+
+[functions]
+verify_jwt = false

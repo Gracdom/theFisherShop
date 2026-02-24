@@ -10,7 +10,7 @@ export default function FloatingButtons() {
         href={`https://wa.me/${WHATSAPP_NUMBER}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-20 right-6 w-12 h-12 lg:w-16 lg:h-16 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg z-40 transition-all duration-300 hover:scale-110"
+        className="fixed bottom-20 right-6 lg:bottom-24 lg:right-6 w-12 h-12 lg:w-14 lg:h-14 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-lg z-40 transition-all duration-300 hover:scale-110"
         aria-label="Contactar por WhatsApp"
       >
         <svg

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { callNewsletter } from '@/lib/supabase-functions'
 import { useState } from 'react'
 
 const STORE = {
@@ -9,41 +10,6 @@ const STORE = {
   whatsapp: '34910202911',
   whatsappDisplay: '+34 910 202 911',
 }
-
-const blogPosts = [
-  {
-    id: 1,
-    title: 'Mejores técnicas de pesca con mosca en agua dulce',
-    excerpt: 'Guía práctica para principiantes...',
-    date: '15 Ene, 2025',
-    href: '/blog/tecnicas-pesca-mosca',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=120&h=80&fit=crop',
-  },
-  {
-    id: 2,
-    title: 'Cómo elegir la caña de pescar ideal',
-    excerpt: 'Tamaño, material y potencia según el tipo de pesca...',
-    date: '8 Ene, 2025',
-    href: '/blog/elegir-cana-pescar',
-    image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=120&h=80&fit=crop',
-  },
-  {
-    id: 3,
-    title: 'Mantenimiento de carretes de pesca',
-    excerpt: 'Limpieza y conservación para prolongar su vida útil...',
-    date: '20 Dic, 2024',
-    href: '/blog/mantenimiento-carretes',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=80&fit=crop',
-  },
-  {
-    id: 4,
-    title: 'Señuelos más efectivos para pesca en mar',
-    excerpt: 'Tipos de señuelos según la temporada y la especie...',
-    date: '5 Dic, 2024',
-    href: '/blog/senuelos-pesca-mar',
-    image: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=120&h=80&fit=crop',
-  },
-]
 
 const infoLinks = [
   { href: '/sobre-nosotros', label: 'Sobre nosotros' },
@@ -63,32 +29,22 @@ const accountLinks = [
 ]
 
 const socialLinks = [
-  { href: 'https://facebook.com', label: 'Facebook', icon: 'fab fa-facebook-f' },
-  { href: 'https://x.com', label: 'X', icon: 'fab fa-x-twitter' },
-  { href: 'https://youtube.com', label: 'YouTube', icon: 'fab fa-youtube' },
-  { href: 'https://instagram.com', label: 'Instagram', icon: 'fab fa-instagram' },
-  { href: 'https://pinterest.com', label: 'Pinterest', icon: 'fab fa-pinterest-p' },
+  { href: 'https://www.facebook.com/thefishershops/', label: 'Facebook', icon: 'fab fa-facebook-f' },
+  { href: 'https://www.instagram.com/thefishershop/', label: 'Instagram', icon: 'fab fa-instagram' },
 ]
 
 export default function Footer() {
   const [email, setEmail] = useState('')
-  const [blogPage, setBlogPage] = useState(0)
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [openSection, setOpenSection] = useState<string | null>(null)
-  const visibleBlogPosts = blogPosts.slice(blogPage * 2, blogPage * 2 + 2)
 
   const handleNewsletter = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || !email.includes('@')) return
     setNewsletterStatus('loading')
     try {
-      const res = await fetch('/api/newsletter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), source: 'footer' }),
-      })
-      const data = await res.json()
-      if (res.ok || data.subscribed) {
+      const data = await callNewsletter({ email: email.trim(), source: 'footer' })
+      if (data.subscribed) {
         setNewsletterStatus('success')
         setEmail('')
       } else {
@@ -235,8 +191,8 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* TABLET Y DESKTOP: Grid de 4 columnas */}
-        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+        {/* TABLET Y DESKTOP: Grid de 3 columnas (blog oculto) */}
+        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-8">
           {/* Columna 1 - Store Information */}
           <div>
             <Link href="/" className="inline-block mb-5">
@@ -326,62 +282,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Columna 4 - Our Blog */}
-          <div>
-            <div className="flex items-center justify-between mb-5">
-              <h5 className="font-sans font-semibold text-white text-base">
-                Nuestro blog
-              </h5>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setBlogPage((p) => Math.max(0, p - 1))}
-                  disabled={blogPage === 0}
-                  className="w-8 h-8 rounded border border-white/30 flex items-center justify-center text-white/80 hover:border-secondary hover:text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-                  aria-label="Previous"
-                >
-                  <i className="fas fa-chevron-left text-xs"></i>
-                </button>
-                <button
-                  onClick={() => setBlogPage((p) => Math.min(1, p + 1))}
-                  disabled={blogPage >= 1}
-                  className="w-8 h-8 rounded border border-white/30 flex items-center justify-center text-white/80 hover:border-secondary hover:text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-                  aria-label="Next"
-                >
-                  <i className="fas fa-chevron-right text-xs"></i>
-                </button>
-              </div>
-            </div>
-            <div className="space-y-4">
-              {visibleBlogPosts.map((post) => (
-                <Link
-                  key={post.id}
-                  href={post.href}
-                  className="flex gap-3 group"
-                >
-                  <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-white/10">
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-white text-sm mb-0.5 group-hover:text-secondary transition line-clamp-2">
-                      {post.title}
-                    </h4>
-                    <p className="text-white/70 text-xs mb-1 line-clamp-1">{post.excerpt}</p>
-                    <div className="flex items-center gap-1.5 text-white/60 text-xs">
-                      <i className="far fa-calendar-alt"></i>
-                      <span>{post.date}</span>
-                    </div>
-                    <span className="text-secondary text-xs font-medium group-hover:underline">
-                      Leer más
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 

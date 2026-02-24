@@ -5,7 +5,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useCart } from '@/context/CartContext'
+import { useFavorites } from '@/context/FavoritesContext'
 import CartModal from './CartModal'
+import SearchOverlay from './SearchOverlay'
 
 interface CategoryItem {
   id: string
@@ -15,9 +17,11 @@ interface CategoryItem {
 
 export default function Header() {
   const { getTotalItems, getTotalPrice } = useCart()
+  const { favorites, openFavorites } = useFavorites()
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [categories, setCategories] = useState<CategoryItem[]>([])
   const pathname = usePathname()
 
@@ -210,6 +214,7 @@ export default function Header() {
             {/* Iconos de acción */}
             <div className="flex items-center gap-3">
               <button 
+                onClick={() => setIsSearchOpen(true)}
                 className={`p-1.5 rounded-lg transition-all hover:scale-110 ${
                   showTransparent 
                     ? 'hover:bg-white/20 text-white' 
@@ -219,9 +224,9 @@ export default function Header() {
               >
                 <i className="fas fa-search text-base"></i>
               </button>
-              <Link 
-                href="/favoritos" 
-                className={`p-1.5 rounded-lg transition-all hover:scale-110 ${
+              <button
+                onClick={openFavorites}
+                className={`relative p-1.5 rounded-lg transition-all hover:scale-110 ${
                   showTransparent 
                     ? 'hover:bg-white/20 text-white' 
                     : 'hover:bg-gray-100 text-gray-900'
@@ -229,7 +234,12 @@ export default function Header() {
                 aria-label="Favoritos"
               >
                 <i className="far fa-heart text-base"></i>
-              </Link>
+                {favorites.length > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full">
+                    {favorites.length > 99 ? '99+' : favorites.length}
+                  </span>
+                )}
+              </button>
               <button
                 onClick={() => setIsCartOpen(true)}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all hover:scale-105 relative ${
@@ -257,6 +267,15 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-white border-t border-gray-200 shadow-xl">
           <nav className="container mx-auto px-4 py-3">
+            <button
+              onClick={() => { setIsMobileMenuOpen(false); setIsSearchOpen(true) }}
+              className="flex items-center gap-3 w-full py-3 text-left font-semibold"
+              style={{ color: '#072652' }}
+            >
+              <i className="fas fa-search"></i>
+              Buscar productos
+            </button>
+            <hr className="border-gray-100 my-2" />
             <ul className="flex flex-col gap-4">
               <li>
                 <Link
@@ -323,12 +342,23 @@ export default function Header() {
                   FAQ
                 </Link>
               </li>
+              <li>
+                <button
+                  onClick={() => { setIsMobileMenuOpen(false); openFavorites() }}
+                  className="w-full text-left font-semibold py-2 block transition flex items-center gap-2"
+                  style={{ color: '#072652' }}
+                >
+                  <i className="far fa-heart"></i>
+                  Favoritos {favorites.length > 0 && `(${favorites.length})`}
+                </button>
+              </li>
             </ul>
           </nav>
         </div>
       )}
 
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </header>
   )
 }

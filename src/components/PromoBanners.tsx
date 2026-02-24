@@ -40,7 +40,7 @@ export default function PromoBanners() {
               <p className="text-xl mb-5 font-light">
                 spinning extremo
               </p>
-              <a href="/tienda" className="inline-block bg-primary text-white px-8 py-2.5 rounded-full font-semibold hover:bg-secondary transition text-sm uppercase">
+              <a href="/tienda?categoria=carretes" className="inline-block bg-primary text-white px-8 py-2.5 rounded-full font-semibold hover:bg-secondary transition text-sm uppercase">
                 Comprar
               </a>
             </div>

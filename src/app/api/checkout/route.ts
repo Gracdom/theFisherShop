@@ -123,8 +123,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ sessionId: session.id, orderNumber: order.orderNumber })
   } catch (error: any) {
     console.error('Error en checkout:', error)
+    const message = error?.message || 'Error desconocido'
     return NextResponse.json(
-      { error: error.message },
+      { error: message },
       { status: 500 }
     )
   }

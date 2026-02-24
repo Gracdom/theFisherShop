@@ -1,16 +1,11 @@
 'use client'
 
+import Image from 'next/image'
+
 const brands = [
-  'Shimano',
-  'Daiwa',
-  'Penn',
-  'Abu Garcia',
-  'Rapala',
-  'Berkley',
-  'Okuma',
-  'St. Croix',
-  'G.Loomis',
-  'Fenwick',
+  { name: 'Shimano', logo: '/marcas/Shimano-Logo.webp' },
+  { name: 'Mitchell', logo: '/marcas/logo-de-la-marque-mitchell.webp' },
+  { name: 'Kalikunnan', logo: '/marcas/kalikunnan-logo-preta.png' },
 ]
 
 export default function BrandsCarousel() {
@@ -24,13 +19,20 @@ export default function BrandsCarousel() {
         </p>
       </div>
       <div className="relative">
-        <div className="flex gap-20 items-center animate-marquee">
-          {brandItems.map((name, i) => (
+        <div className="flex gap-16 items-center animate-marquee">
+          {brandItems.map((brand, i) => (
             <div
-              key={`${name}-${i}`}
-              className="flex-shrink-0 px-4 py-2 text-gray-400 text-xl font-bold tracking-tight opacity-80 hover:opacity-100 hover:text-primary transition-all duration-300"
+              key={`${brand.name}-${i}`}
+              className="flex-shrink-0 flex items-center justify-center h-12 opacity-70 hover:opacity-100 transition-all duration-300"
+              style={{ minWidth: 120 }}
             >
-              {name}
+              <Image
+                src={brand.logo}
+                alt={brand.name}
+                width={120}
+                height={48}
+                className="object-contain w-auto h-10 md:h-12"
+              />
             </div>
           ))}
         </div>

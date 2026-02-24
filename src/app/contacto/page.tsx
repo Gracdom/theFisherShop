@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { callContact } from '@/lib/supabase-functions'
 
 type FormData = { name: string; email: string; subject: string; message: string }
 
@@ -44,13 +45,8 @@ export default function ContactoPage() {
     setError(null)
     setLoading(true)
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Error al enviar')
+      const data = await callContact(form)
+      if (!data.success && data.error) throw new Error(data.error)
       setSent(true)
       setForm({ name: '', email: '', subject: '', message: '' })
     } catch (err) {

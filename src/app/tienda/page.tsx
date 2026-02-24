@@ -125,6 +125,11 @@ function TiendaContent() {
   const router = useRouter()
   const categorySlug = searchParams.get('categoria')
   const subcategorySlug = searchParams.get('subcategoria')
+  const qParam = searchParams.get('q')
+
+  useEffect(() => {
+    if (qParam) setSearchQuery(qParam)
+  }, [qParam])
 
   useEffect(() => {
     async function fetch() {
@@ -149,23 +154,56 @@ function TiendaContent() {
           categoryId = cat?.id ?? null
         }
 
-        let query = supabase
-          .from('Product')
-          .select('id, slug, name, description, price, oldPrice, image, images, rating, featured, trending')
-
-        if (categoryId) query = query.eq('categoryId', categoryId)
+        let data: ApiProduct[] | null = null
+        let error: unknown = null
 
         if (subcategorySlug && categoryId) {
+          const selectCols = 'id, slug, name, description, price, oldPrice, image, images, rating, featured, trending'
           const { data: sub } = await supabase
             .from('Subcategory')
             .select('id')
             .eq('slug', subcategorySlug)
             .eq('categoryId', categoryId)
-            .single()
-          if (sub) query = query.eq('subcategoryId', sub.id)
+            .maybeSingle()
+          const { data: subAlt } = sub?.id ? { data: null } : await supabase
+            .from('Subcategory')
+            .select('id')
+            .eq('slug', subcategorySlug)
+            .eq('category_id', categoryId)
+            .maybeSingle()
+          const subId = sub?.id ?? subAlt?.id
+
+          if (subId) {
+            const res = await supabase
+              .from('Product')
+              .select(selectCols)
+              .eq('categoryId', categoryId)
+              .eq('subcategoryId', subId)
+              .order('createdAt', { ascending: false })
+            data = res.data
+            error = res.error
+            if (error) {
+              const res2 = await supabase
+                .from('Product')
+                .select(selectCols)
+                .eq('categoryId', categoryId)
+                .eq('subcategory_id', subId)
+                .order('createdAt', { ascending: false })
+              data = res2.data
+              error = res2.error
+            }
+          }
         }
 
-        const { data, error } = await query.order('createdAt', { ascending: false })
+        if (!data) {
+          let query = supabase
+            .from('Product')
+            .select('id, slug, name, description, price, oldPrice, image, images, rating, featured, trending')
+          if (categoryId) query = query.eq('categoryId', categoryId)
+          const res = await query.order('createdAt', { ascending: false })
+          data = res.data
+          error = res.error
+        }
         if (error) throw error
         setProducts((data || []).map(mapToCard))
 
@@ -392,8 +430,8 @@ function TiendaContent() {
               <div className="space-y-1">
                 {[
                   { value: 'default', label: 'Más relevantes', icon: 'fa-fire' },
-                  { value: 'price-asc', label: 'Menor precio', icon: 'fa-arrow-up' },
-                  { value: 'price-desc', label: 'Mayor precio', icon: 'fa-arrow-down' },
+                  { value: 'price-asc', label: 'Precio - menor a mayor', icon: 'fa-arrow-up' },
+                  { value: 'price-desc', label: 'Precio - mayor a menor', icon: 'fa-arrow-down' },
                   { value: 'name', label: 'Nombre A-Z', icon: 'fa-sort-alpha-down' },
                 ].map((opt) => (
                   <button
@@ -565,48 +603,17 @@ function TiendaContent() {
                       </Link>
                     </li>
                     {categories.map((c) => {
-                      const fromDb = subsByCategory[c.id] || []
-                      const fromDefaults = DEFAULT_SUBCATEGORIES[c.slug] || []
-                      const subs = fromDb.length > 0
-                        ? fromDb
-                        : fromDefaults.map((s, i) => ({ id: `default-${c.id}-${i}`, name: s.name, slug: s.slug }))
                       const isActive = categorySlug === c.slug
                       return (
                         <li key={c.id}>
                           <Link
                             href={`/tienda?categoria=${c.slug}`}
                             className={`block py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 ${
-                              isActive && !subcategorySlug ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-100 hover:text-primary'
+                              isActive ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-100 hover:text-primary'
                             }`}
                           >
                             {c.name}
                           </Link>
-                          {subs.length > 0 && isActive && (
-                            <ul className="pl-4 mt-0.5 mb-2 space-y-0.5 border-l-2 border-gray-200 ml-4">
-                              <li>
-                                <Link
-                                  href={`/tienda?categoria=${c.slug}`}
-                                  className={`block py-2 px-3 rounded-lg text-sm transition-all ${
-                                    isActive && !subcategorySlug ? 'text-primary font-medium' : 'text-gray-500 hover:text-primary hover:bg-gray-100/80'
-                                  }`}
-                                >
-                                  Todas
-                                </Link>
-                              </li>
-                              {subs.map((s) => (
-                                <li key={s.id}>
-                                  <Link
-                                    href={`/tienda?categoria=${c.slug}&subcategoria=${s.slug}`}
-                                    className={`block py-2 px-3 rounded-lg text-sm transition-all ${
-                                      isActive && subcategorySlug === s.slug ? 'text-primary font-medium' : 'text-gray-500 hover:text-primary hover:bg-gray-100/80'
-                                    }`}
-                                  >
-                                    {s.name}
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
-                          )}
                         </li>
                       )
                     })}
@@ -737,8 +744,8 @@ function TiendaContent() {
                 <div className="flex items-center gap-3">
                   <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary">
                     <option value="default">Por defecto</option>
-                    <option value="price-asc">Precio ↑</option>
-                    <option value="price-desc">Precio ↓</option>
+                    <option value="price-asc">Precio - menor a mayor</option>
+                    <option value="price-desc">Precio - mayor a menor</option>
                     <option value="name">Nombre</option>
                   </select>
                   <select value={itemsPerPage} onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1) }} className="px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary">

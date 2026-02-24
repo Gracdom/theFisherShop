@@ -38,7 +38,9 @@ model Product {
   sku         String      @unique
   name        String
   slug        String      @unique
-  description String?
+  shortDescription String?   // descripción corta (1-2 frases, cards/listados)
+  description      String?   // descripción larga (completa, página producto)
+  highlights       String[]  // 2 características principales generadas por IA
   price       Float
   oldPrice    Float?
   pvd         Float?
@@ -64,6 +66,7 @@ model Product {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   orderItems    OrderItem[]
+  productReviews ProductReview[]
   category      Category    @relation(fields: [categoryId], references: [id])
   subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
 
@@ -72,6 +75,18 @@ model Product {
   @@index([featured])
   @@index([trending])
   @@index([sku])
+}
+
+model ProductReview {
+  id        String   @id @default(cuid())
+  productId String
+  author    String
+  rating    Int      // 4 o 5
+  text      String
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
 }
 
 model Customer {

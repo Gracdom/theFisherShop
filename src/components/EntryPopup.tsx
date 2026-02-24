@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { callNewsletter } from '@/lib/supabase-functions'
 
 const STORAGE_KEY = 'thefishershop-popup-dismissed'
 
@@ -30,13 +31,8 @@ export default function EntryPopup() {
     e.preventDefault()
     if (!email) return
     try {
-      const res = await fetch('/api/newsletter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), source: 'popup' }),
-      })
-      const data = await res.json()
-      if (res.ok || data.subscribed) {
+      const data = await callNewsletter({ email: email.trim(), source: 'popup' })
+      if (data.subscribed) {
         setSubmitted(true)
         setEmail('')
         setTimeout(() => handleClose(), 1500)

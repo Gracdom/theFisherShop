@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useCart, STORAGE_EMAIL_KEY } from '@/context/CartContext'
 import { useRouter } from 'next/navigation'
 import { loadStripe } from '@stripe/stripe-js'
+import { callAbandonedCart } from '@/lib/supabase-functions'
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
@@ -36,14 +37,10 @@ export default function CheckoutPage() {
     if (!customerInfo.email || cart.length === 0 || abandonedSent.current) return
     const t = setTimeout(() => {
       abandonedSent.current = true
-      fetch('/api/abandoned-cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: customerInfo.email,
-          name: customerInfo.name || undefined,
-          items: cart.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
-        }),
+      callAbandonedCart({
+        email: customerInfo.email,
+        name: customerInfo.name || undefined,
+        items: cart.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
       }).catch(() => {})
     }, 2 * 60 * 1000)
     return () => clearTimeout(t)
@@ -57,27 +54,23 @@ export default function CheckoutPage() {
   }
 
   const handleCheckout = async () => {
-    if (!customerInfo.name || !customerInfo.email || !customerInfo.address) {
-      alert('Por favor completa todos los campos obligatorios')
+    if (!customerInfo.name || !customerInfo.email || !customerInfo.address || !customerInfo.city || !customerInfo.postalCode) {
+      alert('Por favor completa todos los campos obligatorios (nombre, email, dirección, ciudad y código postal)')
       return
     }
 
     setLoading(true)
 
     try {
-      // Crear sesión de Stripe Checkout
-      const response = await fetch('/api/checkout', {
+      const res = await fetch('/api/checkout', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          items: cart,
-          customerInfo,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: cart, customerInfo }),
       })
-
-      const { sessionId } = await response.json()
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Error al crear la sesión de pago')
+      const sessionId = data.sessionId
+      if (!sessionId) throw new Error(data.error || 'Error al crear la sesión de pago')
 
       // Redirigir a Stripe Checkout
       const stripe = await stripePromise
@@ -85,11 +78,12 @@ export default function CheckoutPage() {
 
       if (error) {
         console.error('Stripe Error:', error)
-        alert('Error al procesar el pago. Por favor, inténtalo de nuevo.')
+        alert(`Error Stripe: ${error.message}`)
       }
     } catch (error) {
+      const msg = error instanceof Error ? error.message : 'Error al procesar el pago. Por favor, inténtalo de nuevo.'
       console.error('Error:', error)
-      alert('Error al procesar el pago. Por favor, inténtalo de nuevo.')
+      alert(msg)
     } finally {
       setLoading(false)
     }

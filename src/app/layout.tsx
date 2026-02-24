@@ -7,12 +7,14 @@ import EntryPopup from '@/components/EntryPopup'
 import CartEmailPopup from '@/components/CartEmailPopup'
 import FloatingButtons from '@/components/FloatingButtons'
 import { CartProvider } from '@/context/CartContext'
+import { FavoritesProvider } from '@/context/FavoritesContext'
+import FavoritesModal from '@/components/FavoritesModal'
 import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Escamar Pesca - Equipamiento de pesca profesional',
+  title: 'Equipamiento de pesca profesional | The Fisher Shop',
   description: 'Tu tienda online de confianza para todo tipo de equipo de pesca. Calidad profesional al mejor precio.',
   icons: {
     icon: '/favicon.webp',
@@ -50,6 +52,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           />
         </noscript>
         <CartProvider>
+        <FavoritesProvider>
           <Header />
           <main className="min-h-screen pt-24">
             {children}
@@ -58,6 +61,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <EntryPopup />
           <CartEmailPopup />
           <FloatingButtons />
+          <FavoritesModal />
+        </FavoritesProvider>
         </CartProvider>
         <Script id="zoho-init" strategy="beforeInteractive">
           {`window.$zoho=window.$zoho||{};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`}

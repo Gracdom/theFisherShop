@@ -15,14 +15,18 @@
     "prisma:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
     "db:import": "tsx prisma/import-csv.ts",
+    "db:generate-descriptions": "tsx prisma/generate-descriptions.ts",
+    "db:generate-reviews": "tsx prisma/generate-reviews.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@google/genai": "^1.42.0",
     "@prisma/client": "^5.9.0",
     "@stripe/stripe-js": "^2.4.0",
     "@supabase/supabase-js": "^2.95.2",
     "lucide-react": "^0.575.0",
     "next": "^14.1.0",
+    "openai": "^6.23.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "resend": "^6.9.2",

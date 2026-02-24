@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useCart } from '@/context/CartContext'
+import { useFavorites } from '@/context/FavoritesContext'
 import { useState } from 'react'
 
 export interface Product {
@@ -26,7 +27,21 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, linkToProduct = true, variant = 'grid' }: ProductCardProps) {
   const { addToCart } = useCart()
+  const { toggleFavorite, isFavorite } = useFavorites()
   const [showNotification, setShowNotification] = useState(false)
+
+  const favorited = isFavorite(product.id)
+  const handleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    toggleFavorite({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+      image: product.image || undefined,
+    })
+  }
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -83,6 +98,13 @@ export default function ProductCard({ product, linkToProduct = true, variant = '
           {product.badge}
         </div>
       )}
+      <button
+        onClick={handleFavorite}
+        className="absolute top-2 right-2 sm:top-4 sm:right-4 w-9 h-9 rounded-full bg-white/90 shadow-md flex items-center justify-center z-10 hover:scale-110 transition"
+        aria-label={favorited ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+      >
+        <i className={`${favorited ? 'fas text-red-500' : 'far text-gray-400'} fa-heart text-base`}></i>
+      </button>
       {/* Imagen aspect-square en móvil para look app */}
       <div className="w-full aspect-square sm:h-44 md:h-52 bg-gray-50 rounded-xl sm:rounded-2xl flex items-center justify-center overflow-hidden group-hover:bg-gray-100/50 transition-colors">
         {product.image ? (
@@ -133,6 +155,13 @@ export default function ProductCard({ product, linkToProduct = true, variant = '
           {product.badge}
         </div>
       )}
+      <button
+        onClick={handleFavorite}
+        className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 shadow-md flex items-center justify-center z-10 hover:scale-110 transition"
+        aria-label={favorited ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+      >
+        <i className={`${favorited ? 'fas text-red-500' : 'far text-gray-400'} fa-heart text-base`}></i>
+      </button>
       {showNotification && (
         <div className="absolute top-3 right-3 bg-primary text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium animate-bounce">
           ¡Añadido! ✓
