@@ -1,15 +1,23 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { resend, canSendEmail, fromEmail } from '@/lib/resend'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   if (!canSendEmail() || !resend) {
     return NextResponse.json({ error: 'Resend no configurado' }, { status: 500 })
+  }
+
+  const to = request.nextUrl.searchParams.get('to')?.trim()
+  if (!to || !to.includes('@')) {
+    return NextResponse.json(
+      { error: 'Indica el destinatario: ?to=tu@email.com' },
+      { status: 400 }
+    )
   }
 
   try {
     const { data, error } = await resend.emails.send({
       from: fromEmail,
-      to: ['karen.rivera@gracdom.com'],
+      to: [to],
       subject: 'Prueba de correo - The Fisher Shop',
       html: `
         <div style="font-family: sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">

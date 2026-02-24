@@ -84,6 +84,9 @@ serve(async (req) => {
       success_url: successUrl,
       cancel_url: `${appUrl}/checkout`,
       customer_email: customerInfo.email,
+      payment_intent_data: {
+        description: 'The Fisher Shop - Compra',
+      },
       metadata: {
         customerName: customerInfo.name,
         address: customerInfo.address,

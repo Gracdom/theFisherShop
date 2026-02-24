@@ -3,6 +3,7 @@ import { Resend } from 'https://esm.sh/resend@2.0.0'
 import { corsHeaders } from '../_shared/cors.ts'
 
 const STORE_EMAIL = 'info@thefishershop.com'
+const ADMIN_EMAIL = Deno.env.get('ADMIN_EMAIL')?.trim() || 'karen.rivera@gracdom.com'
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
@@ -52,14 +53,24 @@ ${subject ? `<p><strong>Asunto:</strong> ${esc(String(subject))}</p>` : ''}
     const resend = new Resend(apiKey)
     const fromEmail = Deno.env.get('RESEND_FROM') || 'The Fisher Shop <info@thefishershop.com>'
 
-    const { data, error } = await resend.emails.send({
-      from: fromEmail,
-      to: [STORE_EMAIL],
-      replyTo: emailStr,
-      subject: subjectLine,
-      html,
-    })
+    const [storeResult, adminResult] = await Promise.all([
+      resend.emails.send({
+        from: fromEmail,
+        to: [STORE_EMAIL],
+        replyTo: emailStr,
+        subject: subjectLine,
+        html,
+      }),
+      resend.emails.send({
+        from: fromEmail,
+        to: [ADMIN_EMAIL],
+        replyTo: emailStr,
+        subject: `[Admin] ${subjectLine}`,
+        html,
+      }),
+    ])
 
+    const error = storeResult.error || adminResult.error
     if (error) {
       return new Response(JSON.stringify({ error: 'Error al enviar. Inténtalo de nuevo.' }), {
         status: 500,
@@ -67,7 +78,7 @@ ${subject ? `<p><strong>Asunto:</strong> ${esc(String(subject))}</p>` : ''}
       })
     }
 
-    return new Response(JSON.stringify({ success: true, id: data?.id }), {
+    return new Response(JSON.stringify({ success: true, id: storeResult.data?.id }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (err) {

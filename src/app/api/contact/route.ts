@@ -3,6 +3,7 @@ import { resend, canSendEmail, fromEmail } from '@/lib/resend'
 import { contactReceivedEmail } from '@/lib/emails/contact-received'
 
 const STORE_EMAIL = 'info@thefishershop.com'
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.trim() || 'karen.rivera@gracdom.com'
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,14 +44,24 @@ export async function POST(request: NextRequest) {
       message: String(message).trim(),
     })
 
-    const { data, error } = await resend!.emails.send({
-      from: fromEmail,
-      to: [STORE_EMAIL],
-      replyTo: emailStr,
-      subject: subjectLine,
-      html,
-    })
+    const [storeResult, adminResult] = await Promise.all([
+      resend!.emails.send({
+        from: fromEmail,
+        to: [STORE_EMAIL],
+        replyTo: emailStr,
+        subject: subjectLine,
+        html,
+      }),
+      resend!.emails.send({
+        from: fromEmail,
+        to: [ADMIN_EMAIL],
+        replyTo: emailStr,
+        subject: `[Admin] ${subjectLine}`,
+        html,
+      }),
+    ])
 
+    const error = storeResult.error || adminResult.error
     if (error) {
       console.error('Resend error:', error)
       return NextResponse.json(
@@ -59,7 +70,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({ success: true, id: data?.id })
+    return NextResponse.json({ success: true, id: storeResult.data?.id })
   } catch (err) {
     console.error('Contact API error:', err)
     return NextResponse.json(
