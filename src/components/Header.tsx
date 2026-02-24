@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useCart } from '@/context/CartContext'
 import { useFavorites } from '@/context/FavoritesContext'
+import { useCompare } from '@/context/CompareContext'
 import CartModal from './CartModal'
 import SearchOverlay from './SearchOverlay'
 
@@ -18,6 +19,7 @@ interface CategoryItem {
 export default function Header() {
   const { getTotalItems, getTotalPrice } = useCart()
   const { favorites, openFavorites } = useFavorites()
+  const { items: compareItems, open: openCompare } = useCompare()
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -237,6 +239,22 @@ export default function Header() {
                 {favorites.length > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full">
                     {favorites.length > 99 ? '99+' : favorites.length}
+                  </span>
+                )}
+              </button>
+              <button
+                onClick={openCompare}
+                className={`relative p-1.5 rounded-lg transition-all hover:scale-110 ${
+                  showTransparent 
+                    ? 'hover:bg-white/20 text-white' 
+                    : 'hover:bg-gray-100 text-gray-900'
+                }`}
+                aria-label="Comparar productos"
+              >
+                <i className="fas fa-sliders-h text-base"></i>
+                {compareItems.length > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-primary text-white text-[10px] font-bold rounded-full">
+                    {compareItems.length > 99 ? '99+' : compareItems.length}
                   </span>
                 )}
               </button>

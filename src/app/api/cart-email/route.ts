@@ -23,9 +23,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    await prisma.checkoutLead.create({
-      data: { email: normalizedEmail },
-    })
+    try {
+      await prisma.checkoutLead.create({
+        data: { email: normalizedEmail },
+      })
+    } catch (dbError) {
+      // Si falla la base de datos, al menos guardamos en localStorage en el cliente
+      console.error('Cart email DB error:', dbError)
+    }
 
     return NextResponse.json({
       message: 'Email guardado',
@@ -34,7 +39,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Cart email error:', error)
     return NextResponse.json(
-      { error: 'Error al guardar el email' },
+      { error: 'Error al procesar la petición' },
       { status: 500 }
     )
   }

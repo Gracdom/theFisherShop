@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useCart } from '@/context/CartContext'
 import { useFavorites } from '@/context/FavoritesContext'
+import { useCompare } from '@/context/CompareContext'
 import { useState } from 'react'
 
 export interface Product {
@@ -28,9 +29,11 @@ interface ProductCardProps {
 export default function ProductCard({ product, linkToProduct = true, variant = 'grid' }: ProductCardProps) {
   const { addToCart } = useCart()
   const { toggleFavorite, isFavorite } = useFavorites()
+  const { toggleCompare, isCompared } = useCompare()
   const [showNotification, setShowNotification] = useState(false)
 
   const favorited = isFavorite(product.id)
+  const compared = isCompared(product.id)
   const handleFavorite = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -39,6 +42,19 @@ export default function ProductCard({ product, linkToProduct = true, variant = '
       name: product.name,
       slug: product.slug,
       price: product.price,
+      image: product.image || undefined,
+    })
+  }
+
+  const handleCompare = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    toggleCompare({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+      rating: product.rating,
       image: product.image || undefined,
     })
   }
@@ -104,6 +120,13 @@ export default function ProductCard({ product, linkToProduct = true, variant = '
         aria-label={favorited ? 'Quitar de favoritos' : 'Añadir a favoritos'}
       >
         <i className={`${favorited ? 'fas text-red-500' : 'far text-gray-400'} fa-heart text-base`}></i>
+      </button>
+      <button
+        onClick={handleCompare}
+        className="absolute top-12 right-2 sm:top-[3.75rem] sm:right-4 w-9 h-9 rounded-full bg-white/90 shadow-md flex items-center justify-center z-10 hover:scale-110 transition text-[11px] text-gray-500"
+        aria-label={compared ? 'Quitar de comparación' : 'Añadir a comparación'}
+      >
+        <i className="fas fa-sliders-h"></i>
       </button>
       {/* Imagen aspect-square en móvil para look app */}
       <div className="w-full aspect-square sm:h-44 md:h-52 bg-gray-50 rounded-xl sm:rounded-2xl flex items-center justify-center overflow-hidden group-hover:bg-gray-100/50 transition-colors">

@@ -34,8 +34,16 @@ export default function CarritoPage() {
                 key={item.id}
                 className="bg-white rounded-xl p-4 flex gap-4 shadow-sm"
               >
-                <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <i className="fas fa-fish text-gray-400 text-2xl"></i>
+                <div className="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <i className="fas fa-fish text-gray-400 text-2xl"></i>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-gray-900 truncate">{item.name}</h3>

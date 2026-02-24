@@ -8,6 +8,8 @@ import FloatingButtons from '@/components/FloatingButtons'
 import { CartProvider } from '@/context/CartContext'
 import { FavoritesProvider } from '@/context/FavoritesContext'
 import FavoritesModal from '@/components/FavoritesModal'
+import { CompareProvider } from '@/context/CompareContext'
+import CompareModal from '@/components/CompareModal'
 import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -51,16 +53,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           />
         </noscript>
         <CartProvider>
-        <FavoritesProvider>
-          <Header />
-          <main className="min-h-screen pt-24">
-            {children}
-          </main>
-          <Footer />
-          <CartEmailPopup />
-          <FloatingButtons />
-          <FavoritesModal />
-        </FavoritesProvider>
+          <FavoritesProvider>
+            <CompareProvider>
+              <Header />
+              <main className="min-h-screen pt-24">
+                {children}
+              </main>
+              <Footer />
+              <CartEmailPopup />
+              <FloatingButtons />
+              <FavoritesModal />
+              <CompareModal />
+            </CompareProvider>
+          </FavoritesProvider>
         </CartProvider>
         <Script id="zoho-init" strategy="beforeInteractive">
           {`window.$zoho=window.$zoho||{};$zoho.salesiq=$zoho.salesiq||{ready:function(){}}`}
