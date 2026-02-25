@@ -18,23 +18,32 @@ const getHeaders = () => {
 
 export async function callCreateCheckoutSession(body: { items: unknown[]; customerInfo: Record<string, string> }) {
   const base = getFunctionsUrl()
-  if (!base) throw new Error('NEXT_PUBLIC_SUPABASE_URL no configurada')
-  const res = await fetch(`${base}/create-checkout-session`, {
+  if (base) {
+    try {
+      const res = await fetch(`${base}/create-checkout-session`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(body),
+      })
+      const data = await res.json()
+      if (res.ok && data?.sessionId) return data
+      console.warn('create-checkout-session falló, usando fallback:', data?.error || res?.status)
+    } catch (e) {
+      console.warn('create-checkout-session error (network/timeout), usando fallback:', e)
+    }
+  }
+  // Fallback a API Next.js si Edge Function falla (timeout, CORS, no desplegada, etc.)
+  const res = await fetch('/api/checkout', {
     method: 'POST',
-    headers: getHeaders(),
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
   const data = await res.json()
-
   if (!res.ok) {
-    // Aseguramos que siempre devolvemos texto comprensible
-    console.error('Error create-checkout-session:', data)
-    const serialized = JSON.stringify(
-      data && (data.error || data.message || data) || { status: res.status },
-    )
-    throw new Error(serialized)
+    console.error('Error /api/checkout:', data)
+    throw new Error(data?.error || 'Error al crear la sesión de pago. Por favor, inténtalo de nuevo.')
   }
-
+  if (!data?.sessionId) throw new Error(data?.error || 'Error al crear la sesión de pago.')
   return data
 }
 
